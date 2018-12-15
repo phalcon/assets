@@ -1,4 +1,16 @@
 title: Phalcon Assets
 description: Assets is a site designed to serve assets for phalcon websites
-show_downloads: true
 google_analytics: "UA-90300500-8"
+
+permalink: /:title/
+
+exclude:
+  - vendor
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE
+  - README.md
+  - CNAME
+
+
+
