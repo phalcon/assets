@@ -1,16 +1,46 @@
-title: Phalcon Assets
-description: Assets is a site designed to serve assets for phalcon websites
-google_analytics: "UA-133802124-7"
+app:
+  name: Phalcon Assets
+  author: "Phalcon Team"
+  description: "Phalcon Assets is a site designed to serve assets to Phalcon websites"
+  keywords: "php, assets phalcon, phalcon php, php framework, faster php framework"
+  avatar: https://avatars3.githubusercontent.com/u/1221505?v=4
+  url: https://assets.phalconphp.com
+  baseurl: "/"
+  analytics: 'UA-133802124-7'
 
-permalink: /:title/
+social:
+  email: team@phalconphp.com
+  facebook:
+  github: phalcon
+  rss: phalcon
+  twitter: phalconphp
 
+permalink: /:title
+
+# Conversion
+markdown: kramdown
+highlighter: rouge
+lsi: false
+incremental: false
+
+# Markdown Processing
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  hard_wrap: false
+  auto_ids: true
+  entity_output: as_char
+  toc_levels: 1..6
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  enable_coderay: false
+
+sass:
+  style: :compressed # You might prefer to minify using :compressed
+
+# Exclude these files from your production _site
 exclude:
-  - vendor
   - Gemfile
   - Gemfile.lock
   - LICENSE
   - README.md
-  - CNAME
-
-
-
+  - vendor

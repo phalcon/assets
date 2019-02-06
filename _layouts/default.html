@@ -1,26 +1,24 @@
 <!DOCTYPE html>
-<html lang="{{ site.lang | default: "en-US" }}">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description"content="Phalcon Assets">
-    <meta name="author" content="Phalcon Team">
-    <link rel="shortcut icon"
-          type="image/png"
-          href="https://assets.phalconphp.com/phalcon/favicon.ico"/>
-    
-    <title>{{ site.title }}</title>
-    {% if "" != site.analytics %}
-    <script>
-        window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-        ga('create', '{{ site.analytics }}', '{{ site.url }}');
-        ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-    {% endif %}
+    {% include meta.html %}
+    {% include analytics.html %}
 </head>
-
 <body>
-{{ content }}
+{% include header.html %}
+
+<div class="phalcon-blog">
+    <div class="container">
+        <div class="phalcon-blog__main">
+            {{ content }}
+        </div>
+        <div class="phalcon-blog__right">
+            {% include sponsors.html %}
+            {% include widget.html %}
+        </div>
+    </div>
+</div>
+{% include footer.html %}
 </body>
 </html>
+
