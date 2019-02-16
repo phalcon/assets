@@ -1071,6 +1071,10 @@ a:focus {
   display: flex;
   margin-bottom: 35px; }
 
+.phalcon-blog__item-content {
+  width: 100%;
+}
+
 .phalcon-blog__item-img {
   display: block;
   width: 180px;
@@ -1435,6 +1439,12 @@ a:focus {
   margin-right: 22px;
   margin-bottom: 5px;
   position: relative; }
+
+phalcon-blog-detail .phalcon-blog-detail__author a {
+  font-size: 12px;
+  line-height: 12px;
+}
+
 .phalcon-blog-detail__author:nth-child(2):after {
   position: absolute;
   content: '';
