@@ -6,3 +6,8 @@
 .header-nav--mobile .header-dropdown--mobile a:after {
   display: none;
 }
+
+.table-link {
+  overflow: auto;
+  display: block;
+}
