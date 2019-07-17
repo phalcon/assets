@@ -11,3 +11,18 @@
   overflow: auto;
   display: block;
 }
+
+.tag-button {
+  color: #385B56;
+  line-height: 23px;
+  font-size: 16px;
+  border-bottom: 1px solid #385B56;
+  -webkit-transition: all .125s;
+  -o-transition: all .125s;
+  transition: all .125s;
+}
+
+.tag-button:hover {
+  background-color: #273646;
+  color: #fff;
+}
