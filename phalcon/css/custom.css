@@ -13,13 +13,20 @@
 }
 
 .tag-button {
+  display: inline-block;
   color: #385B56;
   line-height: 23px;
   font-size: 16px;
-  border-bottom: 1px solid #385B56;
   -webkit-transition: all .125s;
   -o-transition: all .125s;
   transition: all .125s;
+  padding: 5px 12px;
+  color: #68727e;
+  border: 1px solid rgba(39, 54, 70, 0.1);
+  border-bottom: 1px solid #385B56;
+  margin-bottom: 13px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
 }
 
 .tag-button:hover {
