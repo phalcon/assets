@@ -12,6 +12,10 @@
   display: block;
 }
 
+.table-link td {
+  vertical-align: top;
+}
+
 .tag-button {
   display: inline-block;
   line-height: 23px;
