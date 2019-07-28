@@ -16,6 +16,10 @@
   vertical-align: top;
 }
 
+.table-link td:first-child {
+  padding-right: 20px;
+}
+
 .tag-button {
   display: inline-block;
   line-height: 23px;
