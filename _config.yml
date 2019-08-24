@@ -4,7 +4,7 @@ app:
   description: "Phalcon Assets is a site designed to serve assets to Phalcon websites"
   keywords: "php, assets phalcon, phalcon php, php framework, faster php framework"
   avatar: https://avatars3.githubusercontent.com/u/1221505?v=4
-  url: https://assets.phalconphp.com
+  url: https://assets.phalcon.io
   baseurl: "/"
   analytics: 'UA-133802124-7'
 
@@ -44,3 +44,4 @@ exclude:
   - LICENSE
   - README.md
   - vendor
+  - serve
