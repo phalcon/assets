@@ -11,7 +11,7 @@
     <meta name="description" content="{{ site.app.description }}">
 
     <!-- Facebook -->
-    <meta property="og:url" content="{{ site.url }}">
+    <meta property="og:url" content="{{ site.app.url }}">
     <meta property="og:locale" content="en_US">
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ site.app.name }}">
@@ -20,7 +20,7 @@
     {% else %}
     <meta property="og:description" content="{{ site.app.description }}">
     {% endif %}
-    <meta property="og:site_name" content="Phalcon Blog">
+    <meta property="og:site_name" content="{{ site.app.name }}">
     <meta property="og:image" content="https://assets.phalcon.io/phalcon/social/github.phalcon.assets.png">
     <meta property="og:image:secure_url" content="https://assets.phalcon.io/phalcon/social/github.phalcon.assets.png">
     <meta property="og:image:type" content="image/png">
@@ -37,7 +37,7 @@
     <meta name="twitter:image" content="https://assets.phalcon.io/phalcon/social/github.phalcon.assets.png">
     <meta name="twitter:image:alt" content="{{ site.app.name }}">
     <meta name="twitter:site" content="@{{ site.social.twitter }}">
-    <meta name="twitter:creator" content=Phalcon Team">
+    <meta name="twitter:creator" content="Phalcon Team">
 
     <link rel="canonical" href="{{ site.url }}{{ page.url }}">
     <link rel="publisher" href="{{ site.url }}{{ page.url }}">
