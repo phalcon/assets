@@ -478,6 +478,7 @@ a:focus {
 }
 
 .form-button {
+    display: block;
     font-size: 16px;
     color: #273646;
     height: 38px;
@@ -497,6 +498,93 @@ a:focus {
     border: 1px solid rgba(39, 54, 70, 0.3);
     -webkit-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
     box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.green-button {
+    display: block;
+    width: 161px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background-color: rgba(143, 193, 154, 0.7);
+    color: #fff;
+    height: 48px;
+    line-height: 48px;
+    text-align: center;
+    border: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-transition: .2s;
+    -o-transition: .2s;
+    transition: .2s;
+}
+
+.green-button:hover {
+    background-color: #8FC19A;
+}
+
+.green-button-light {
+    display: block;
+    padding: 0 39px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 15px;
+    text-align: center;
+    font-family: 'Lato';
+    font-weight: 500;
+    font-style: normal;
+    color: #8FC19A;
+    border: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background-color: rgba(143, 193, 154, 0.1);
+    -webkit-transition: .2s;
+    -o-transition: .2s;
+    transition: .2s;
+}
+
+.green-button-light:hover {
+    color: #fff;
+    background-color: rgba(143, 193, 154, 0.9);
+}
+
+.black-button {
+    display: block;
+    padding: 0 35px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 15px;
+    text-align: center;
+    font-family: 'Lato';
+    font-weight: normal;
+    font-style: normal;
+    color: #fff;
+    border: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background-color: #273646;
+    -webkit-transition: .2s;
+    -o-transition: .2s;
+    transition: .2s;
+}
+
+.black-button:hover {
+    background-color: #000;
+}
+
+@media (max-width: 767px) {
+    .green-button {
+        background-color: #8FC19A;
+    }
+    .black-button {
+        height: 30px;
+        line-height: 30px;
+        padding: 0 19px;
+        font-size: 12px;
+    }
 }
 
 .input {
@@ -1278,7 +1366,7 @@ input:focus {
 
 @media (min-width: 768px) {
     .container {
-        width: 766px;
+        width: 755px;
         padding-left: 15px;
         padding-right: 15px;
     }
@@ -1295,6 +1383,12 @@ input:focus {
         width: 1200px;
         padding-left: 10px;
         padding-right: 10px;
+    }
+
+    .container--short {
+        width: 917px;
+        padding-left: 0;
+        padding-right: 0;
     }
 }
 
