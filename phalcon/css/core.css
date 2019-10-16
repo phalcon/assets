@@ -982,6 +982,7 @@ input:focus {
         content: url("https://assets.phalconphp.com/phalcon/images/svg/arrow.svg");
         color: #fff;
         position: relative;
+        top: -1px;
         margin-left: 5px; }
   .header-nav--mobile {
     width: 230px;
@@ -1283,6 +1284,8 @@ input:focus {
     margin-right: 28px; }
     .header-nav > li {
       margin-right: 20px; }
+      .header-nav > li.expand > a::after {
+        top: 0; }
   .header__right {
     -webkit-box-align: center;
     -webkit-align-items: center;
