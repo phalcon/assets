@@ -2883,7 +2883,8 @@ input:focus {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  font-size: 12px; }
+  font-size: 12px;
+  line-height: 15px; }
   .base-info-features__list li:before {
     content: '';
     background-image: url("https://assets.phalcon.io/phalcon/images/svg/check.svg");
@@ -2906,6 +2907,35 @@ input:focus {
        object-fit: cover; }
 
 @media (max-width: 1279px) {
+  .base-info {
+    min-height: 575px; }
+  .base-info__left {
+    width: 546px; }
+  .base-info__title {
+    font-size: 44px;
+    line-height: 50px; }
+  .base-info-descr {
+    margin-bottom: 50px; }
+  .base-info-descr__first {
+    font-size: 19px;
+    line-height: 22px; }
+  .base-info-descr__second {
+    font-size: 15px;
+    line-height: 22px; }
+  .base-info-features__list-wrap {
+    width: 329px;
+    height: 414px; }
+  .base-info-features__img {
+    width: 562px;
+    height: 271px;
+    bottom: -36.6%;
+    left: -46.1%; } }
+
+@media (max-width: 1140px) {
+  .base-info-features__img {
+    left: -51.1%; } }
+
+@media (max-width: 1023px) {
   .base-info {
     margin-bottom: 30px;
     min-height: 411px; }
@@ -2936,13 +2966,13 @@ input:focus {
   .base-info-features__list-wrap {
     width: 203px;
     height: 363px;
-    padding: 23px 20px; }
+    padding: 15px 17px; }
   .base-info-features__title {
     font-size: 15px;
     line-height: 18px;
     margin-bottom: 8px; }
   .base-info-features__list li {
-    font-size: 8px;
+    font-size: 10px;
     line-height: 10px;
     margin-bottom: 5px; }
     .base-info-features__list li:before {
@@ -2971,14 +3001,14 @@ input:focus {
     width: 270px;
     text-align: center; }
   .base-info__title {
-    font-size: 16px;
-    line-height: 19px;
-    margin-bottom: 7px; }
+    font-size: 22px;
+    line-height: 24px;
+    margin-bottom: 10px; }
   .base-info-descr {
     margin-bottom: 18px; }
   .base-info-descr__first {
-    font-size: 10px;
-    line-height: 12px; }
+    font-size: 12px;
+    line-height: 14px; }
   .base-info__buttons {
     -webkit-box-pack: justify;
     -webkit-justify-content: space-between;
@@ -2988,13 +3018,13 @@ input:focus {
       margin-right: 0; } }
 
 .sponsors {
-  margin-bottom: 82px; }
+  margin-bottom: 56px; }
 
 .sponsors__title {
   font-family: 'Titillium Web';
   font-weight: bold;
   font-style: normal;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 24px;
   color: #273646;
   margin-bottom: 40px; }
@@ -3010,24 +3040,24 @@ input:focus {
           justify-content: space-between; }
 
 .sponsors__item {
-  height: 20px; }
+  height: 25px; }
   .sponsors__item img, .sponsors__item svg {
     height: 100%; }
 
 @media (max-width: 1023px) {
   .sponsors {
-    margin-bottom: 70px; }
+    margin-bottom: 30px; }
   .sponsors__title {
-    font-size: 15px;
+    font-size: 17px;
     line-height: 18px;
-    margin-bottom: 30px; } }
+    margin-bottom: 30px; }
+  .sponsors__item {
+    height: 20px; } }
 
 @media (max-width: 767px) {
-  .sponsors {
-    margin-bottom: 40px; }
   .sponsors__title {
-    font-size: 16px;
-    line-height: 19px;
+    font-size: 18px;
+    line-height: 21px;
     margin-bottom: 20px;
     text-align: center; }
   .sponsors__list {
@@ -3073,6 +3103,7 @@ input:focus {
   display: -ms-flexbox;
   display: flex;
   font-size: 16px;
+  line-height: 19px;
   color: rgba(39, 54, 70, 0.7);
   height: 100%; }
   .features-nav__list li {
@@ -3363,7 +3394,7 @@ input:focus {
 
 .watch-demo__title {
   font-weight: bold;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 24px;
   margin-bottom: 10px; }
 
@@ -3385,12 +3416,12 @@ input:focus {
 
 @media (max-width: 1023px) {
   .watch-demo__title {
-    font-size: 15px;
-    line-height: 18px;
+    font-size: 17px;
+    line-height: 19px;
     margin-bottom: 6px; }
   .watch-demo__descr {
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 12px;
+    line-height: 14px;
     margin-bottom: 40px; }
   .watch-demo__video {
     width: 558px;
@@ -3401,12 +3432,10 @@ input:focus {
     text-align: center;
     margin-bottom: 40px; }
   .watch-demo__title {
-    font-size: 16px;
-    line-height: 19px;
+    font-size: 18px;
+    line-height: 22px;
     margin-bottom: 7px; }
   .watch-demo__descr {
-    font-size: 10px;
-    line-height: 12px;
     margin-bottom: 28px; }
   .watch-demo__video {
     width: 280px;
@@ -3446,7 +3475,7 @@ input:focus {
 
 .join__title {
   font-weight: bold;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 24px;
   margin-bottom: 15px; }
 
@@ -3471,12 +3500,12 @@ input:focus {
     top: -114px;
     margin-bottom: -92px; }
   .join__title {
-    font-size: 15px;
-    line-height: 18px;
+    font-size: 17px;
+    line-height: 19px;
     margin-bottom: 6px; }
   .join__descr {
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 12px;
+    line-height: 14px;
     margin-bottom: 20px; } }
 
 @media (max-width: 767px) {
@@ -3485,7 +3514,12 @@ input:focus {
     height: auto;
     position: static;
     margin-bottom: 35px;
+    padding-bottom: 0;
     text-align: center; }
+  .join__title {
+    font-size: 18px;
+    line-height: 22px;
+    margin-bottom: 7px; }
   .join__buttons .black-button:not(:last-child) {
     margin-right: 5px; } }
 
@@ -3515,7 +3549,7 @@ input:focus {
 
 .contibutors__title {
   font-weight: bold;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 24px;
   margin-bottom: 9px; }
 
@@ -3565,16 +3599,16 @@ input:focus {
 .contributors__mobile {
   display: none; }
 
-@media (max-width: 1279px) {
+@media (max-width: 1023px) {
   .contributors__top {
     margin-bottom: 39px; }
   .contibutors__title {
-    font-size: 15px;
-    line-height: 18px;
+    font-size: 17px;
+    line-height: 19px;
     margin-bottom: 5px; }
   .contibutors__descr {
-    font-size: 10px;
-    line-height: 12px; }
+    font-size: 12px;
+    line-height: 14px; }
   .contributors__list-wrap {
     margin: 0;
     padding: 0 19px; }
@@ -3593,8 +3627,8 @@ input:focus {
   .contibutors__descr {
     text-align: center;
     font-weight: bold;
-    font-size: 15px;
-    line-height: 18px; }
+    font-size: 18px;
+    line-height: 21px; }
   .contributors__top {
     margin-bottom: 27px; }
   .contributors__mobile {
