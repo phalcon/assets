@@ -982,7 +982,6 @@ input:focus {
         content: url("https://assets.phalconphp.com/phalcon/images/svg/arrow.svg");
         color: #fff;
         position: relative;
-        top: -2px;
         margin-left: 5px; }
   .header-nav--mobile {
     width: 230px;
@@ -2954,7 +2953,7 @@ input:focus {
   .base-info-descr__devider {
     margin: 10px 0; }
   .base-info-descr__second {
-    font-size: 10px;
+    font-size: 11px;
     line-height: 13.5px; }
   .base-info__right {
     margin: 34px auto 0; }
