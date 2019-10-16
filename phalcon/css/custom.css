@@ -55,3 +55,9 @@
 .pagination a:hover {
   border-bottom-color: transparent;
 }
+
+@media (max-width: 1023px) {
+  .pagination {
+    margin-bottom: 35px;
+  }
+}
