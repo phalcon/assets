@@ -2883,8 +2883,8 @@ input:focus {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  font-size: 12px;
-  line-height: 15px; }
+  font-size: 14px;
+  line-height: 16px; }
   .base-info-features__list li:before {
     content: '';
     background-image: url("https://assets.phalcon.io/phalcon/images/svg/check.svg");
@@ -2938,7 +2938,7 @@ input:focus {
 @media (max-width: 1023px) {
   .base-info {
     margin-bottom: 30px;
-    min-height: 411px; }
+    min-height: 436px; }
   .base-info__left {
     width: 373px; }
   .base-info__title {
@@ -2964,26 +2964,26 @@ input:focus {
     line-height: 38px;
     font-size: 13px; }
   .base-info-features__list-wrap {
-    width: 203px;
-    height: 363px;
+    width: 243px;
+    height: 373px;
     padding: 15px 17px; }
   .base-info-features__title {
     font-size: 15px;
     line-height: 18px;
     margin-bottom: 8px; }
   .base-info-features__list li {
-    font-size: 10px;
-    line-height: 10px;
-    margin-bottom: 5px; }
+    font-size: 12px;
+    line-height: 12px;
+    margin-bottom: 4px; }
     .base-info-features__list li:before {
       width: 8px;
       height: 6px;
       margin-right: 7px; }
   .base-info-features__img {
-    width: 366px;
-    height: 176px;
-    bottom: -9%;
-    left: -56.1%; } }
+    width: 386px;
+    height: 196px;
+    bottom: -14%;
+    left: -38.1%; } }
 
 @media (max-width: 767px) {
   .base-info {
@@ -3285,8 +3285,6 @@ input:focus {
     font-size: 13px; }
     .features-nav__list li {
       margin-right: 30px; }
-      .features-nav__list li span {
-        padding: 22px 0; }
   .features-list__item-title {
     font-size: 13px;
     line-height: 16px; }
