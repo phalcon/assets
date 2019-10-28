@@ -3180,6 +3180,14 @@ input:focus {
   transition: .4s; }
   .features-list__item:not(:last-child) {
     margin-bottom: 11px; }
+  .features-list__item:not(.active):hover::before {
+    display: block;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50px;
+    width: 50px;
+    height: 100%; }
   .features-list__item.active, .features-list__item:hover {
     background-color: #fff;
     -webkit-box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
