@@ -3312,7 +3312,7 @@ input:focus {
         -ms-flex-preferred-size: 391px;
             flex-basis: 391px;
     max-width: 391px;
-    margin: auto; }
+    margin: 0 auto; }
   .feature__code .hljs {
     padding: 30px 30px 40px;
     line-height: 18px; }
