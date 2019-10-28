@@ -3085,8 +3085,8 @@ input:focus {
 
 .features-nav {
   height: 60px;
-  border-top: 1px solid rgba(229, 229, 229, 0.4);
-  border-bottom: 1px solid rgba(229, 229, 229, 0.4); }
+  border-top: 1px solid rgba(229, 229, 229, 0.5);
+  border-bottom: 1px solid rgba(229, 229, 229, 0.5); }
   .features-nav .container {
     display: -webkit-box;
     display: -webkit-flex;
@@ -3118,7 +3118,10 @@ input:focus {
       display: block;
       padding: 20px 0; }
     .features-nav__list li.active, .features-nav__list li:hover {
-      color: #273646; }
+      color: #273646;
+      -webkit-transition: .2s;
+      -o-transition: .2s;
+      transition: .2s; }
       .features-nav__list li.active hr, .features-nav__list li:hover hr {
         width: 100%;
         height: 3px; }
@@ -3131,7 +3134,7 @@ input:focus {
     position: absolute;
     left: 50%;
     bottom: 0;
-    background-color: #385B56;
+    background-color: rgba(39, 54, 70, 0.8);
     -webkit-transition: width .2s ease-in-out;
     -o-transition: width .2s ease-in-out;
     transition: width .2s ease-in-out;
