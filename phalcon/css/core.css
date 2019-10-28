@@ -2833,7 +2833,7 @@ input:focus {
   width: 180px;
   margin: 15px 0;
   border: 0;
-  background-color: rgba(229, 229, 229, 0.4); }
+  background-color: #e5e5e5; }
 
 .base-info-descr__second {
   font-size: 16px;
