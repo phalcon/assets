@@ -1413,6 +1413,9 @@ input:focus {
     -webkit-justify-content: center;
     -ms-flex-pack: center;
     justify-content: center;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
     margin-bottom: 20px;
 }
 
@@ -1467,12 +1470,6 @@ input:focus {
 }
 
 @media (max-width: 767px) {
-    .footer-nav {
-        -webkit-flex-wrap: wrap;
-        -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
-    }
-
     .footer-nav li {
         line-height: 23px;
     }
