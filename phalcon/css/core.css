@@ -1097,7 +1097,7 @@ input:focus {
     .header-dropdown--eco li a {
       display: inline; }
   .header-dropdown--lang {
-    min-width: 165px;
+    min-width: 180px;
     max-height: 403px;
     overflow-y: auto; }
     .header-dropdown--lang li a {
