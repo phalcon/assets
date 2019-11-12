@@ -3538,8 +3538,16 @@ input:focus {
     font-size: 18px;
     line-height: 22px;
     margin-bottom: 7px; }
-  .join__buttons .black-button:not(:last-child) {
-    margin-right: 5px; } }
+  .join__buttons {
+    -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+        -ms-flex-pack: center;
+            justify-content: center; }
+    .join__buttons .black-button:not(:last-child) {
+      margin: 0 5px 10px; } }
 
 .contributors {
   font-family: 'Titillium Web';
