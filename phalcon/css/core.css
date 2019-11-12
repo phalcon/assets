@@ -3256,7 +3256,7 @@ input:focus {
   background: #273646;
   -webkit-border-radius: 4px;
           border-radius: 4px;
-  padding: 50px 30px;
+  padding: 20px 20px;
   min-height: 49px;
   width: 100%;
   line-height: 24px; }
@@ -3320,7 +3320,6 @@ input:focus {
     max-width: 391px;
     margin: 0 auto; }
   .feature__code .hljs {
-    padding: 30px 30px 40px;
     line-height: 18px; }
   .feature__code code {
     font-size: 13px;
@@ -3335,7 +3334,6 @@ input:focus {
   .features__desktop {
     display: none; }
   .feature__code .hljs {
-    padding: 20px 20px;
     line-height: 12px; }
   .feature__code code {
     font-size: 10px;
