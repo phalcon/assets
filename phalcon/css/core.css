@@ -655,7 +655,7 @@ a {
   width: 161px;
   -webkit-border-radius: 3px;
           border-radius: 3px;
-  background-color: rgba(143, 193, 154, 0.7);
+  background-color: #8FC19A;
   color: #fff;
   height: 48px;
   line-height: 48px;
@@ -667,7 +667,7 @@ a {
   -o-transition: .2s;
   transition: .2s; }
   .green-button:hover {
-    background-color: #8FC19A; }
+    background-color: rgba(143, 193, 154, 0.7); }
 
 .green-button-light {
   display: block;
@@ -717,8 +717,6 @@ a {
     background-color: #000; }
 
 @media (max-width: 767px) {
-  .green-button {
-    background-color: #8FC19A; }
   .black-button {
     height: 30px;
     line-height: 30px;
@@ -3536,8 +3534,6 @@ input:focus {
   font-style: normal;
   color: #273642;
   margin-bottom: 30px; }
-  .contributors .green-button-light {
-    padding: 0 30px; }
 
 .contributors__top {
   display: -webkit-box;
