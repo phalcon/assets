@@ -3009,6 +3009,12 @@ input:focus {
 
 .sponsors {
   margin-bottom: 56px; }
+  .sponsors hr {
+    padding: 0;
+    margin: 20px 0 15px;
+    border: 1px solid rgba(39, 54, 70, 0.1);
+    -webkit-border-radius: 2px;
+            border-radius: 2px; }
 
 .sponsors__title {
   font-family: 'Titillium Web';
@@ -3028,6 +3034,11 @@ input:focus {
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between; }
+  .sponsors__list--openc {
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+        -ms-flex-pack: center;
+            justify-content: center; }
 
 .sponsors__item {
   height: 25px; }
