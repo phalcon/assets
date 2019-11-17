@@ -61,3 +61,7 @@
     margin-bottom: 35px;
   }
 }
+
+.phalcon-blog-detail p img {
+  margin-bottom: 0;
+}
