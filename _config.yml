@@ -45,3 +45,4 @@ exclude:
   - README.md
   - vendor
   - serve
+  - updateSponsors.php
