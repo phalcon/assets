@@ -1,4 +1,4 @@
 [build]
   command = "php updateSponsors.php && jekyll build --incremental"
-  publish = "_site"
+  publish = "_site/"
 
