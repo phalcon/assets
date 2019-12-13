@@ -65,3 +65,6 @@
 .phalcon-blog-detail p img {
   margin-bottom: 0;
 }
+.phalcon-blog__item-article img {
+  max-width: 100%;
+}
