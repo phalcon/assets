@@ -14,7 +14,7 @@ file_put_contents(
 echo "Updating Fan Art" . PHP_EOL;
 
 $data = file_get_contents(
-    'https://raw.githubusercontent.com/phalcon/assets/master/phalcon/fan-art-fragment.html'
+    'https://raw.githubusercontent.com/phalcon/assets/master/phalcon/fanart-fragment.html'
 );
 
 file_put_contents(
