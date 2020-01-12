@@ -1,3 +1,7 @@
 .home-sponsors {
   margin-bottom: 40px;
 }
+
+.slick-loading .slick-list {
+  background: none;
+}
