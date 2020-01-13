@@ -5,3 +5,8 @@
 .slick-loading .slick-list {
   background: none;
 }
+
+.features-slider__nav-item:before,
+.features-slider__nav-item:after {
+  content: '';
+}
