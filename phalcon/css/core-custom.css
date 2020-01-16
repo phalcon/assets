@@ -10,3 +10,9 @@
 .features-slider__nav-item:after {
   content: '';
 }
+
+@media (max-width: 767px) {
+  .info .buildwith-nav__list {
+    display: block;
+  }
+}
