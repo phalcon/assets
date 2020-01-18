@@ -16,3 +16,7 @@
     display: block;
   }
 }
+
+.buildwith-nav__list a {
+  text-align: center;
+}
