@@ -40,3 +40,8 @@
 .header-dropdown--mobile-lang img {
   margin-right: 5px;
 }
+
+.header-nav--mobile .extendable a:after{
+  content: url(https://assets.phalcon.io/phalcon/images/svg/arrow.svg);
+  margin-left: 5px;
+}
