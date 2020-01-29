@@ -45,3 +45,7 @@
   content: url(https://assets.phalcon.io/phalcon/images/svg/arrow.svg);
   margin-left: 5px;
 }
+
+.header-nav--mobile .header-dropdown--mobile a:after {
+  display: none;
+}
