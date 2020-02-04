@@ -56,3 +56,11 @@
 .header-nav--mobile .header-dropdown--mobile a:after {
   display: none;
 }
+
+.phalcon-blog__last-article .phalcon-blog__item-img {
+  height: 100%;  
+}
+
+.phalcon-blog__last-article .phalcon-blog__item-img > img {
+  max-width: 100%;  
+}
