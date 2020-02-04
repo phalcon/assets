@@ -64,3 +64,40 @@
 .phalcon-blog__last-article .phalcon-blog__item-img > img {
   max-width: 100%;  
 }
+
+.contributors__list-item {
+  width: 58px;
+  -webkit-flex-basis: -webkit-calc(100%);
+  -ms-flex-preferred-size: calc(100%);
+  flex-basis: calc(100%);
+  max-width: -webkit-calc(100%);
+  max-width: calc(100%);
+}
+
+@media (max-width: 1023px) {
+  .contributors__list-item {
+    -webkit-flex-basis: -webkit-calc(100%);
+    -ms-flex-preferred-size: calc(100%);
+    flex-basis: calc(100%);
+    max-width: -webkit-calc(100%);
+    max-width: calc(100%);
+    width: 60px; }
+}
+
+@media (max-width: 767px) {
+  .contributors__list-item {
+    -webkit-flex-basis: -webkit-calc(100%);
+    -ms-flex-preferred-size: calc(100%);
+    flex-basis: calc(100%);
+    max-width: -webkit-calc(100%);
+    max-width: calc(100%);
+    width: 51px;
+    height: 51px; }
+}
+
+.contributors__list {
+  justify-content: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+}
