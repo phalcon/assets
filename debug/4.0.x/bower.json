@@ -1,7 +1,8 @@
 {
   "name": "phalcon_debug",
   "authors": [
-    "David Schissler <david.schissler@gmail.com>"
+    "David Schissler <david.schissler@gmail.com>",
+    "Ruud Boon <ruud@phalcon.io>"
   ],
   "description": "Phalcon Debug Component",
   "main": "",
@@ -21,8 +22,8 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "^3.1.0",
+    "jquery": "^3.4.1",
     "jquery.scrollTo": "^2.1.2",
-    "jquery-ui": "^1.12.0"
+    "jquery-ui": "^1.12.1"
   }
 }
