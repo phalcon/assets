@@ -112,3 +112,17 @@
   -webkit-justify-content: center;
   -ms-flex-pack: center;
 }
+
+.pagination a {
+  color: #385b56;
+  line-height: 23px;
+  font-size: 16px;
+  border-bottom: 1px solid #385b56;
+  -webkit-transition: all .125s;
+  -o-transition: all .125s;
+  transition: all .125s;
+}
+
+.pagination a:hover {
+  border-bottom-color: transparent;
+}
