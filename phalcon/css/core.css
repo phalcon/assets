@@ -1363,8 +1363,6 @@ input:focus {
     -o-transition: .135s;
     transition: .135s;
     border-bottom: 1px solid transparent; }
-    .footer-nav li:last-child {
-      margin-right: 0; }
     .footer-nav li a {
       color: #000; }
     .footer-nav li:hover {
