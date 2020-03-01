@@ -126,3 +126,21 @@
 .pagination a:hover {
   border-bottom-color: transparent;
 }
+
+.sponsors__list {
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin-bottom: -15px;
+}
+
+.sponsors__item {
+  height: 35px;
+  width: 15%;
+  margin: 15px;
+  text-align: center;
+}
+
+.sponsors__item img {
+  width: 100%;
+}
