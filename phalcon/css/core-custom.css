@@ -148,6 +148,20 @@
     margin: 0 25px 15px;
     width: 30%;
   }
+
+  .features-slider__descr {
+    font-size: 16px;
+    line-height: normal;
+    margin-bottom: 15px;
+  }
+
+  .features-slider__example ul{
+    padding: 0 20px;
+  }
+
+  .features-slider__example li{
+    font-size: 14px;
+  }
 }
 
 .sponsors__item img {
