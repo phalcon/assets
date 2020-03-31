@@ -3396,7 +3396,8 @@ var o2 =
 							centerMode: true,
 							focusOnSelect: true,
 							variableWidth: true,
-							arrows: false
+							arrows: false,
+              adaptiveHeight: true
 						});
 					}
 				}
