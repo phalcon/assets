@@ -3392,7 +3392,6 @@ var o2 =
 							slidesToShow: 3,
 							slidesToScroll: 1,
 							asNavFor: '.features-slider__content',
-							arrows: true,
 							centerMode: true,
 							focusOnSelect: true,
 							variableWidth: true,
@@ -3419,7 +3418,8 @@ var o2 =
 							slidesToScroll: 1,
 							arrows: false,
 							fade: true,
-							asNavFor: '.features-slider__nav'
+							asNavFor: '.features-slider__nav',
+              adaptiveHeight: true
 						});
 					}
 				}
