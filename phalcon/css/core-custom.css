@@ -104,6 +104,14 @@
     flex-basis: 59px;
     max-width: 59px;
     width: 59px; }
+
+  .features-accordion li.active .features-accordion__content {
+    max-height: 100%;
+  }
+
+  .feature__code .hljs {
+    font-size: 12px;
+  }
 }
 
 .contributors__list {
