@@ -158,7 +158,7 @@
   }
 
   .features-slider__descr {
-    font-size: 16px;
+    font-size: 13px;
     line-height: normal;
     margin-bottom: 15px;
   }
@@ -168,6 +168,10 @@
   }
 
   .features-slider__example li{
+    font-size: 12px;
+  }
+
+  .features-slider__nav-item {
     font-size: 14px;
   }
 }
