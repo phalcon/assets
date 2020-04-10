@@ -179,3 +179,8 @@
 .sponsors__item img {
   width: 100%;
 }
+
+.info-block__content hr,
+.sponsors hr {
+  margin: 30px 0 15px;
+}
