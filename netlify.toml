@@ -1,4 +1,3 @@
 [build]
   command = "php updateData.php && jekyll build --incremental"
   publish = "_site/"
-
