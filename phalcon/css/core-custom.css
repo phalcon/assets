@@ -188,3 +188,9 @@
 .sponsors hr {
   margin: 30px 0 15px;
 }
+
+.notFound {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
