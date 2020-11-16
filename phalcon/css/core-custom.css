@@ -194,3 +194,11 @@
   flex-direction: column;
   justify-content: space-between;
 }
+
+.not-found-page {
+  text-align: center;
+}
+
+.not-found-page a {
+  display: inline-block;
+}
