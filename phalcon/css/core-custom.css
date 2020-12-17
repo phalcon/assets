@@ -202,3 +202,11 @@
 .not-found-page a {
   display: inline-block;
 }
+
+.phalcon-blog__main .green-button {
+  background-color: #8fc19a;
+}
+
+.phalcon-blog__main .green-button:hover {
+  background-color: rgba(143,193,154,.7);
+}
