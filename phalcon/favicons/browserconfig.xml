@@ -7,7 +7,7 @@
             <square150x150logo src="https://assets.phalcon.io/phalcon/favicons/mstile-150x150.png"/>
             <square310x310logo src="https://assets.phalcon.io/phalcon/favicons/mstile-310x310.png"/>
             <wide310x150logo src="https://assets.phalcon.io/phalcon/favicons/mstile-310x150.png"/>
-            <TileColor>#da532c</TileColor>
+            <TileColor>#273646</TileColor>
         </tile>
     </msapplication>
 </browserconfig>
