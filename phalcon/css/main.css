@@ -2906,6 +2906,7 @@ input:focus {
     font-size: 14px;
     padding-top: 12px;
     padding-bottom: 12px;
+    overflow: auto;
 }
 
 .phalcon-blog-detail_documetation table td,
