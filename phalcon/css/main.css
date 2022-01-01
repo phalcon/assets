@@ -1502,6 +1502,7 @@ input:focus {
     -webkit-flex: 1;
     -ms-flex: 1;
     flex: 1;
+    overflow: auto;
 }
 
 .phalcon-blog__right {
@@ -2021,6 +2022,7 @@ input:focus {
     width: 100%;
     table-layout: fixed;
     overflow: auto;
+    display: block;
 }
 
 .phalcon-blog-detail table thead {
@@ -2043,7 +2045,6 @@ input:focus {
 .phalcon-blog-detail table td {
     border: 1px solid rgba(39, 54, 70, 0.4);
     padding: 8px 14px;
-    min-width: 150px;
 }
 
 .phalcon-blog-detail blockquote {
@@ -2906,7 +2907,6 @@ input:focus {
     font-size: 14px;
     padding-top: 12px;
     padding-bottom: 12px;
-    overflow: auto;
 }
 
 .phalcon-blog-detail_documetation table td,
