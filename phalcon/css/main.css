@@ -3176,10 +3176,6 @@ input:focus {
     padding-bottom: 7px;
     padding-left: 20px;
     padding-right: 28px;
-    white-space: nowrap;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    overflow: hidden;
     -webkit-transition: color .135s;
     -o-transition: color .135s;
     transition: color .135s;
