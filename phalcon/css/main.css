@@ -1924,6 +1924,7 @@ input:focus {
         -webkit-flex-wrap: wrap;
         -ms-flex-wrap: wrap;
         flex-wrap: wrap;
+        flex-direction: column;
     }
 
     .phalcon-blog__main {
