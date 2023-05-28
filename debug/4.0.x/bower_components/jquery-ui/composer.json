@@ -9,42 +9,42 @@
     "authors": [
         {
             "name": "jQuery UI Team",
-            "homepage": "http://jqueryui.com/about"
+            "homepage": "https://jqueryui.com/about"
         },
         {
             "name": "Scott Gonzalez",
             "email": "scott.gonzalez@gmail.com",
-            "homepage": "http://scottgonzalez.com"
+            "homepage": "https://scottgonzalez.com"
         },
         {
             "name": "Joern Zaefferer",
             "email": "joern.zaefferer@gmail.com",
-            "homepage": "http://bassistance.de"
+            "homepage": "https://bassistance.de"
         },
         {
             "name": "Kris Borchers",
             "email": "kris.borchers@gmail.com",
-            "homepage": "http://krisborchers.com"
+            "homepage": "https://krisborchers.com"
         },
         {
             "name": "Corey Frang",
             "email": "gnarf37@gmail.com",
-            "homepage": "http://gnarf.net"
+            "homepage": "https://gnarf.net"
         },
         {
             "name": "Mike Sherov",
             "email": "mike.sherov@gmail.com",
-            "homepage": "http://mike.sherov.com"
+            "homepage": "https://mike.sherov.com"
         },
         {
             "name": "TJ VanToll",
             "email": "tj.vantoll@gmail.com",
-            "homepage": "http://tjvantoll.com"
+            "homepage": "https://tjvantoll.com"
         },
         {
             "name": "Felix Nagel",
             "email": "info@felixnagel.com",
-            "homepage": "http://www.felixnagel.com"
+            "homepage": "https://www.felixnagel.com"
         }
     ],
     "extra": {
