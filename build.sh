@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 BUILD_BASE="/opt/buildhome/repo"
 INPUT_BASE="https://raw.githubusercontent.com/phalcon/assets/master/phalcon/"
