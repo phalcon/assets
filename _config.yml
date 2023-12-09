@@ -7,8 +7,6 @@ app:
   url: https://assets.phalcon.io
   baseurl: "/"
   analytics: 'G-YDF1W191B2'
-  cloudflare:
-    analytics: '856753626ff24097baf12928e527a6c1'
 
 url: https://assets.phalcon.io
 social:
