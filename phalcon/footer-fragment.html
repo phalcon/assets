@@ -29,3 +29,11 @@
         </div>
     </div>
 </footer>
+
+{% if site.app.cloudflare.analytics %}
+<!-- Cloudflare Web Analytics -->
+<script defer src='https://static.cloudflareinsights.com/beacon.min.js' 
+        data-cf-beacon='{"token": "{{ site.app.cloudflare.analytics }}"}'>
+</script>
+<!-- End Cloudflare Web Analytics -->
+{% endif %}
