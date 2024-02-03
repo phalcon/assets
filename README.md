@@ -6,14 +6,6 @@ This repository holds all the assets that Phalcon sites use. This includes all t
     <img src="https://assets.phalcon.io/phalcon/images/svg/phalcon-logo-transparent-black.svg" height="100" alt="Phalcon"/>
 </a></p>
 
-<p align="center">
-    Hosting by:
-    <br />
-    <a href="https://www.netlify.com">
-        <img src="https://www.netlify.com/img/global/badges/netlify-color-accent.svg"/>
-    </a>
-</p>
-
 ## Sponsors
 
 Become a sponsor and get your logo on our README on Github with a link to your site. [[Become a sponsor](https://opencollective.com/phalcon#sponsor)]
