@@ -58,6 +58,10 @@
     <meta name="msapplication-TileColor" content="#273646">
     <meta name="theme-color" content="#273646">
 
+    <script>document.documentElement.classList.add(localStorage.getItem('mode') === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : localStorage.getItem('mode'))</script>
+    <script type="module" src="./../phalcon/test/theme.js"></script>
+    <link rel="stylesheet"
+          href="./../phalcon/test/dark.css">
 
 
     <link rel="stylesheet"
@@ -66,6 +70,3 @@
     <link rel="stylesheet"
           type="text/css"
           href="https://assets.phalcon.io/phalcon/css/custom.css">
-    <link rel="stylesheet"
-          type="text/css"
-          href="./../phalcon/css/dark.css">
