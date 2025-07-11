@@ -91,6 +91,10 @@ html.dark .features-accordion__trigger {
     color: #ffffff;
 }
 
+html.dark .green-button {
+    color: #ffffff !important;
+}
+
 html.dark .footer__supported-logo svg,
 html.dark .footer__supported-logo svg path {
     stroke: #ffffff;
