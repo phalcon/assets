@@ -80,3 +80,7 @@
 .info-block__img img {
   padding: 5px;
 }
+
+.not-found-page {
+  height: 100%;
+}
