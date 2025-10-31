@@ -71,6 +71,11 @@ html.dark .sponsors__item {
     background-color: #ffffffb3;
 }
 
+html.dark .sponsors__item:hover {
+    border-color: #00bda4 !important;
+    opacity: .9;
+}
+
 html.dark .phalcon-blog__sponsors-item,
 html.dark .sponsors__item :hover {
     border-color: #00bda4 !important;
