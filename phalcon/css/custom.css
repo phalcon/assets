@@ -77,6 +77,10 @@
   border: 1px solid rgba(39, 54, 70, .4);
 }
 
+.sponsors__item:hover {
+    border-color: #00bda4;
+}
+
 .info-block__img img {
   padding: 5px;
 }
