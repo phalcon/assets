@@ -1,0 +1,94 @@
+.header-nav--mobile {
+    .extendable a:after {
+        content: url(https://assets.phalcon.io/phalcon/images/svg/arrow.svg);
+        margin-left: 5px;
+    }
+
+    .header-dropdown--mobile a:after {
+        display: none;
+    }
+}
+
+.table-link {
+    overflow: auto;
+    display: block;
+
+    td {
+        vertical-align: top;
+
+        &:first-child {
+            padding-right: 20px;
+        }
+    }
+}
+
+.tag-button {
+    display: inline-block;
+    line-height: 23px;
+    font-size: 14px;
+    -webkit-transition: all .125s;
+    -o-transition: all .125s;
+    transition: all .125s;
+    padding: 5px 12px;
+    color: #273646;
+    font-weight: 700;
+    border: 1px solid rgba(39, 54, 70, 0.1);
+    border-bottom: 1px solid #385B56;
+    margin-bottom: 13px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+
+    &:hover {
+        background-color: #273646;
+        color: #fff;
+    }
+}
+
+.pagination a {
+    color: #385B56;
+    line-height: 23px;
+    font-size: 16px;
+    border-bottom: 1px solid #385B56;
+    -webkit-transition: all .125s;
+    -o-transition: all .125s;
+    transition: all .125s;
+
+    &:hover {
+        border-bottom-color: transparent;
+    }
+}
+
+@media (max-width: 1023px) {
+    .pagination {
+        margin-bottom: 35px;
+    }
+}
+
+.phalcon-blog-detail p img {
+    margin-bottom: 0;
+}
+
+.phalcon-blog__item-article img {
+    max-width: 100%;
+}
+
+.sponsors__item {
+    padding: 13px 14px;
+    height: 60px;
+    margin: 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(39, 54, 70, 0.4);
+    transition: all .2s ease;
+
+    &:hover {
+        border-color: #273646;
+    }
+}
+
+.info-block__img img {
+    padding: 5px;
+}
+
+.not-found-page {
+    height: 100%;
+}
