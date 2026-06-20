@@ -68,8 +68,9 @@ body {
 .masthead { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--muted); font-weight: 600; }
 .brand .logo {
-    width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #1f6feb, #5fb3ff);
-    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 14px;
+    height: 26px;
+    width: auto;
+    display: block;
 }
 .actions-top { display: flex; align-items: center; gap: 8px; }
 .btn {
