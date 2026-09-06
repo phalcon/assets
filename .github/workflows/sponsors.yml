@@ -1,0 +1,55 @@
+# Regenerates phalcon/sponsors.json from GitHub Sponsors, Open Collective and
+# the hand-kept partner list, then commits it when it actually changed.
+#
+# The commit uses GITHUB_TOKEN, so it deliberately does not trigger other
+# workflows. Consumers read the file from raw.githubusercontent.com, which
+# serves it as soon as the commit lands; only new logo images under
+# phalcon/images/ need the Cloudflare Pages build to catch up.
+name: Update sponsors
+
+on:
+  schedule:
+    # Daily, off the hour to avoid the peak of scheduled runs.
+    - cron: "17 4 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sponsors
+  cancel-in-progress: false
+
+jobs:
+  sponsors:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: 8.4
+
+      - name: Generate the roster
+        # The script exits non-zero when a platform returns nothing, so a
+        # broken token fails the run instead of publishing a thinner roster.
+        env:
+          SPONSORS_TOKEN: ${{ secrets.SPONSORS_TOKEN }}
+        run: php generateSponsors.php
+
+      - name: Commit when the roster changed
+        run: |
+          if git diff --quiet -- phalcon/sponsors.json; then
+            echo "No change to the roster"
+            exit 0
+          fi
+
+          git config user.name niden
+          git config user.email nikos@niden.net
+          git add phalcon/sponsors.json
+          git commit -m "Updating the sponsors roster"
+          git push
