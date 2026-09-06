@@ -43,13 +43,17 @@ jobs:
 
       - name: Commit when the roster changed
         run: |
-          if git diff --quiet -- phalcon/sponsors.json; then
+          # Stage first: `git diff` ignores untracked files, so comparing
+          # before adding reports "no change" the first time the file is
+          # generated, when it is exactly the run that has to commit.
+          git add phalcon/sponsors.json
+
+          if git diff --cached --quiet -- phalcon/sponsors.json; then
             echo "No change to the roster"
             exit 0
           fi
 
           git config user.name niden
           git config user.email nikos@niden.net
-          git add phalcon/sponsors.json
           git commit -m "Updating the sponsors roster"
           git push
