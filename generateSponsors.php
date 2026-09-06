@@ -18,7 +18,7 @@ declare(strict_types=1);
  *   - GitHub Sponsors, GraphQL, needs SPONSORS_TOKEN (read:org + read:user).
  *     read:user is what makes privacyLevel readable; without it a private
  *     sponsor cannot be told from a public one.
- *   - sponsors/partners.json, the in-kind list. Cloudflare and the like give
+ *   - _sponsors/partners.json, the in-kind list. Cloudflare and the like give
  *     us service tiers, never appear in either API, and are most of the block.
  *
  * Usage: php generateSponsors.php
@@ -27,8 +27,10 @@ declare(strict_types=1);
 const GITHUB_API      = 'https://api.github.com/graphql';
 const OPENCOLLECTIVE  = 'https://api.opencollective.com/graphql/v2';
 const OUTPUT          = __DIR__ . '/phalcon/sponsors.json';
-const OVERRIDES_FILE  = __DIR__ . '/sponsors/overrides.json';
-const PARTNERS_FILE   = __DIR__ . '/sponsors/partners.json';
+// Underscore-prefixed so Jekyll leaves it out of the published site: these
+// are inputs to the generator, not artifacts for the sites to fetch.
+const OVERRIDES_FILE  = __DIR__ . '/_sponsors/overrides.json';
+const PARTNERS_FILE   = __DIR__ . '/_sponsors/partners.json';
 
 /** Open Collective lists the GitHub Sponsors payout as a member of itself. */
 const OC_EXCLUDED_SLUGS = ['github-sponsors'];
