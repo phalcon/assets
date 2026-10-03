@@ -1,0 +1,36 @@
+# Checks phalcon/css/tokens.css, the design tokens that every Phalcon site
+# uses, when the file or its checks change. The file changes only by hand, so
+# this workflow makes no commit. Consumers read the file from
+# raw.githubusercontent.com.
+name: Check design tokens
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - phalcon/css/tokens.css
+      - _tokens/**
+      - tests/tokens.php
+      - .github/workflows/tokens.yml
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tokens:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: 8.4
+
+      - name: Check the tokens
+        run: php tests/tokens.php
