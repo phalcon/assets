@@ -1,0 +1,64 @@
+# Regenerates phalcon/repositories.json (stars and releases) and
+# phalcon/contributors.json for the repositories in _github/repositories.json,
+# then commits them when they changed.
+#
+# It runs 30 minutes after the sponsors workflow. Both push to master, so this
+# one rebases before it pushes. The commit uses GITHUB_TOKEN, so it does not
+# trigger other workflows. Consumers read the files from
+# raw.githubusercontent.com, which serves them as soon as the commit lands.
+name: Update GitHub data
+
+on:
+  schedule:
+    # Daily, 30 minutes after the sponsors workflow (17 4 * * *).
+    - cron: "47 4 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-data
+  cancel-in-progress: false
+
+jobs:
+  github-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: 8.4
+
+      - name: Test the rules
+        run: php tests/github.php
+
+      - name: Generate the data
+        # The script exits non-zero when a repository returns nothing, so an
+        # API problem fails the run instead of publishing partial data.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: php generateGithub.php
+
+      - name: Commit when the data changed
+        run: |
+          # Stage first: `git diff` ignores untracked files, so comparing
+          # before adding reports "no change" the first time the files are
+          # generated, when it is exactly the run that has to commit.
+          git add phalcon/repositories.json phalcon/contributors.json
+
+          if git diff --cached --quiet -- phalcon/repositories.json phalcon/contributors.json; then
+            echo "No change to the GitHub data"
+            exit 0
+          fi
+
+          git config user.name niden
+          git config user.email nikos@niden.net
+          git commit -m "Updating the GitHub data"
+          git pull --rebase
+          git push
