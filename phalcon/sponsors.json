@@ -199,6 +199,17 @@
             ]
         },
         {
+            "id": "oc:barry",
+            "name": "Barry Helfrich",
+            "url": "https://opencollective.com/barry",
+            "logo": "https://images.opencollective.com/barry/avatar.png",
+            "group": "supporter",
+            "kind": "financial",
+            "source": [
+                "opencollective"
+            ]
+        },
+        {
             "id": "oc:borisdelev",
             "name": "Boris Delev",
             "url": "https://bd.fyi",
