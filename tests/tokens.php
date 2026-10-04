@@ -86,8 +86,8 @@ $check(
     [] === tokenProblems($fixture("    /* note: one; two */\n"))
 );
 $check(
-    'tokenProblems accepts a last declaration with no semicolon',
-    [] === tokenProblems($fixture("    --ph-extra-color: #123456\n"))
+    'tokenProblems reads a required last declaration with no semicolon',
+    [] === tokenProblems($fixture("    --ph-font-sans: sans-serif\n", '--ph-font-sans'))
 );
 $check(
     'tokenProblems accepts a syntax color at 4.54:1',
