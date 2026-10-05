@@ -2,10 +2,23 @@
 
 /**
  * Pure functions for tests/tokens.php. They check phalcon/css/tokens.css, the
- * design tokens that every Phalcon site uses. They read no files.
+ * design tokens that every Phalcon site uses, and phalcon/css/code-theme.json,
+ * the code theme that uses them. They read no files.
  */
 
 declare(strict_types=1);
+
+/**
+ * The top-level keys of a code theme. Shiki also reads bg, fg, settings and colorReplacements, and each of them
+ * can set a color that is not a token.
+ */
+const CODE_KEYS = ['colors', 'name', 'tokenColors', 'type'];
+
+/** The keys that a rule of the code theme can set. A background is not one: the tokens have no such colors. */
+const CODE_SETTINGS = ['fontStyle', 'foreground'];
+
+/** A color of the code theme: var(--code-<role>). The match is the role. */
+const CODE_VAR_PATTERN = '/^var\(--code-([a-z0-9-]+)\)$/';
 
 /** The fonts that every site needs. */
 const FONT_TOKENS = ['--ph-font-mono', '--ph-font-sans'];
@@ -66,6 +79,102 @@ const TONES = ['dark', 'light'];
 
 /** A tone value that refers to a palette color. The match is the name of the color. */
 const VAR_PATTERN = '/^var\((--ph-[a-z0-9-]+)\)$/';
+
+/**
+ * Every problem in a code theme file, one line each. $roles are the syntax
+ * roles of the tokens file (see syntaxRoles()). An empty list means that the
+ * file is correct.
+ *
+ * @param list<string> $roles
+ *
+ * @return list<string>
+ */
+function codeThemeProblems(string $json, array $roles): array
+{
+    $theme = json_decode($json, true);
+
+    if (!is_array($theme) || array_is_list($theme)) {
+        return ['the file is not a JSON object'];
+    }
+
+    $problems = [];
+
+    foreach (array_keys($theme) as $key) {
+        if (!in_array($key, CODE_KEYS, true)) {
+            $problems[] = $key . ': not allowed (only colors, name, tokenColors and type)';
+        }
+    }
+
+    if (!is_string($theme['name'] ?? null) || '' === $theme['name']) {
+        $problems[] = 'name: missing';
+    }
+
+    if (!in_array($theme['type'] ?? null, ['dark', 'light'], true)) {
+        $problems[] = 'type: must be dark or light';
+    }
+
+    $colors = $theme['colors'] ?? null;
+
+    if (
+        !is_array($colors)
+        || 'var(--code-bg)' !== ($colors['editor.background'] ?? null)
+        || 'var(--code-text)' !== ($colors['editor.foreground'] ?? null)
+    ) {
+        $problems[] = 'colors: editor.background must be var(--code-bg), and editor.foreground var(--code-text)';
+    }
+
+    foreach (is_array($colors) ? array_keys($colors) : [] as $key) {
+        if (!in_array($key, ['editor.background', 'editor.foreground'], true)) {
+            $problems[] = 'colors.' . $key . ': not allowed (only editor.background and editor.foreground)';
+        }
+    }
+
+    $rules = $theme['tokenColors'] ?? null;
+
+    if (!is_array($rules) || [] === $rules || !array_is_list($rules)) {
+        return [...$problems, 'tokenColors: must be a list of rules'];
+    }
+
+    foreach ($rules as $index => $rule) {
+        $label = 'tokenColors[' . $index . ']';
+        $scope = is_array($rule) ? ($rule['scope'] ?? null) : null;
+        $settings = is_array($rule) ? ($rule['settings'] ?? null) : null;
+        // A blank scope makes the rule the default of all text, so every scope must have a name.
+        $scopes = is_string($scope) ? [$scope] : (is_array($scope) && array_is_list($scope) ? $scope : []);
+        $named = array_filter($scopes, static fn (mixed $item): bool => is_string($item) && '' !== trim($item));
+
+        if ([] === $scopes || count($named) !== count($scopes)) {
+            $problems[] = $label . ': scope must be a string or a list of strings, and none can be blank';
+        }
+
+        if (!is_array($settings) || [] === $settings) {
+            $problems[] = $label . ': settings missing';
+
+            continue;
+        }
+
+        foreach (array_keys($settings) as $key) {
+            if (!in_array($key, CODE_SETTINGS, true)) {
+                $problems[] = $label . ': settings.' . $key . ' is not allowed (only fontStyle and foreground)';
+            }
+        }
+
+        if (!array_key_exists('foreground', $settings)) {
+            continue;
+        }
+
+        $foreground = $settings['foreground'];
+        $role = is_string($foreground) && 1 === preg_match(CODE_VAR_PATTERN, $foreground, $match) ? $match[1] : null;
+
+        if (null === $role) {
+            $problems[] = $label . ': foreground must be var(--code-<role>)';
+        } elseif (!in_array($role, $roles, true)) {
+            $problems[] = $label . ': --code-' . $role . ' has no syntax token in the tokens file';
+        }
+    }
+
+    return $problems;
+}
 
 /**
  * The WCAG 2 contrast ratio of two #rrggbb colors, from 1 to 21. The order of
@@ -153,6 +262,63 @@ function resolvedHex(string $value, array $palette): ?string
     $hex = $palette[$match[1]] ?? '';
 
     return 1 === preg_match(HEX_PATTERN, $hex) ? $hex : null;
+}
+
+/**
+ * The color that Shiki gives a scope: the foreground of the last rule that names the scope and sets a foreground.
+ * A later rule with a font style only does not change the color. Null when no rule names the scope.
+ *
+ * @param array<mixed> $rules the tokenColors of a code theme
+ */
+function scopeColor(array $rules, string $scope): ?string
+{
+    $color = null;
+
+    foreach ($rules as $rule) {
+        if (!is_array($rule) || !in_array($scope, (array) ($rule['scope'] ?? []), true)) {
+            continue;
+        }
+
+        $settings = is_array($rule['settings'] ?? null) ? $rule['settings'] : [];
+
+        if (is_string($settings['foreground'] ?? null)) {
+            $color = $settings['foreground'];
+        }
+    }
+
+    return $color;
+}
+
+/**
+ * The syntax roles that both tones of a tokens file define, without the
+ * "syntax-" prefix, sorted. A code theme can use --code-<role> for each one.
+ *
+ * @return list<string>
+ */
+function syntaxRoles(string $css): array
+{
+    $names = [];
+
+    foreach (parseRules($css)['rules'] as $rule) {
+        foreach (parseDeclarations($rule['body']) as ['name' => $name]) {
+            $names[$name] = true;
+        }
+    }
+
+    $roles = [];
+
+    foreach (array_keys($names) as $name) {
+        if (
+            1 === preg_match('/^--ph-light-syntax-([a-z0-9-]+)$/', $name, $match)
+            && array_key_exists('--ph-dark-syntax-' . $match[1], $names)
+        ) {
+            $roles[] = $match[1];
+        }
+    }
+
+    sort($roles);
+
+    return $roles;
 }
 
 /**
