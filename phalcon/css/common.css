@@ -12,6 +12,10 @@
  * a:visited, li:last-child), or a class with an element (.page a). A site
  * must put such rules on its own content only (for example main a:hover).
  *
+ * The sizes in rem need the font size of the browser on html (16px). A site
+ * must not change the font size of html: the rem sizes then change and the px
+ * sizes do not, and the nav and the footer lose their proportions.
+ *
  * The markup. Each site keeps its own copy. The mobile menu script uses the
  * ids and the aria attributes.
  *

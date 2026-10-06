@@ -327,6 +327,19 @@ $check(
         && !in_array('currentcolor', $colorNames, true)
 );
 
+// SYSTEM_COLORS (generated from the npm package mdn-data)
+/** @var list<string> $systemColors */
+$systemColors = SYSTEM_COLORS;
+$sortedSystem = $systemColors;
+sort($sortedSystem);
+$check(
+    'SYSTEM_COLORS has the system colors of CSS, in lowercase and in order',
+    in_array('canvastext', $systemColors, true)
+        && in_array('highlight', $systemColors, true)
+        && $sortedSystem === $systemColors
+        && $systemColors === array_map('strtolower', $systemColors)
+);
+
 // commonProblems
 $commonTokens = ['--ph-font-sans', '--ph-mist-100'];
 $common = static fn (string $extra = ''): string => "/* A comment can name #fff, rgb(0 0 0) and red. */\n"
@@ -414,6 +427,64 @@ $check(
 $check(
     'commonProblems rejects another at-rule',
     $commonFinds($common("@font-face { font-family: x; }\n"), '@font-face: an at-rule that is not allowed')
+);
+$check(
+    'commonProblems rejects a nested @media block',
+    $commonFinds(
+        $common(
+            "@media (min-width: 64rem) {\n    @media (hover: hover) {\n        .ph-nav { display: none; }\n    }\n}\n"
+        ),
+        '@media: an at-rule that is not allowed'
+    )
+);
+$check(
+    'commonProblems rejects text outside a rule',
+    $commonFinds($common(".ph-nav { display: block; }\nstray\n"), 'text outside a rule: stray')
+);
+$check(
+    'commonProblems rejects a sibling of the nav',
+    $commonFinds(
+        $common(".ph-nav ~ * { display: none; }\n"),
+        '.ph-nav ~ *: a sibling combinator leaves .ph-nav or .ph-footer'
+    )
+);
+$check(
+    'commonProblems rejects a sibling of the footer',
+    $commonFinds(
+        $common(".ph-footer + main { display: none; }\n"),
+        '.ph-footer + main: a sibling combinator leaves .ph-nav or .ph-footer'
+    )
+);
+$check(
+    'commonProblems accepts a sibling inside the nav',
+    [] === commonProblems($common(".ph-nav li + li { margin: 0; }\n"), $commonTokens)
+);
+$check(
+    'commonProblems rejects a system color',
+    $commonFinds($common(".ph-nav { color: CanvasText; }\n"), 'a color name: canvastext')
+);
+$check(
+    'commonProblems rejects initial as a color',
+    $commonFinds($common(".ph-nav { color: initial; }\n"), 'initial: not allowed for a color')
+);
+$check(
+    'commonProblems accepts a property name in a transition',
+    [] === commonProblems($common(".ph-nav { transition: background 0.2s; }\n"), $commonTokens)
+);
+$check(
+    'commonProblems rejects image-set()',
+    $commonFinds(
+        $common(".ph-nav { background-image: image-set(\"x.png\" 1x); }\n"),
+        'image-set(): not allowed'
+    )
+);
+$check(
+    'commonProblems accepts a function that has a color name',
+    [] === commonProblems($common(".ph-nav { rotate: calc(tan(45deg) * 1rad); }\n"), $commonTokens)
+);
+$check(
+    'commonProblems puts a selector on one line in its messages',
+    $commonFinds($common(".ph-nav,\n.ph-footer { color: white; }\n"), '.ph-nav, .ph-footer color: a color name: white')
 );
 
 // phalcon/css/tokens.css

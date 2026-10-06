@@ -189,10 +189,12 @@ function codeThemeProblems(string $json, array $roles): array
  * means that the file is correct.
  *
  * The file is plain CSS with no nesting, except one level of the @media blocks
- * of COMMON_MEDIA and the @supports blocks of COMMON_SUPPORTS. Each selector
- * starts with .ph-nav or .ph-footer. A value
- * takes its colors from the tokens: it has no typed color and no color name,
- * and each var() is a token of tokens.css.
+ * of COMMON_MEDIA and the @supports blocks of COMMON_SUPPORTS. It loads no
+ * file (no @import, url() or image-set()). Each selector starts with .ph-nav
+ * or .ph-footer and does not go to a sibling of them. A value takes its colors
+ * from the tokens: it has no typed color, no color name and no system color, a
+ * color property is not initial, unset or revert, and each var() is a token of
+ * tokens.css.
  *
  * @param list<string> $tokens
  *
@@ -209,6 +211,10 @@ function commonProblems(string $css, array $tokens): array
 
     if (1 === preg_match('/url\s*\(/i', $css)) {
         $problems[] = 'url(): not allowed';
+    }
+
+    if (1 === preg_match('/image-set\s*\(/i', $css)) {
+        $problems[] = 'image-set(): not allowed';
     }
 
     // The @media and @supports blocks come out first. Each one holds rules with no nesting.
@@ -245,10 +251,13 @@ function commonProblems(string $css, array $tokens): array
 
         foreach ($parsed['rules'] as ['selector' => $selector, 'body' => $body]) {
             foreach (preg_split('/,(?![^(]*\))/', $selector) ?: [] as $part) {
-                $part = trim($part);
+                $part = (string) preg_replace('/\s+/', ' ', trim($part));
 
                 if (1 !== preg_match('/^\.ph-(?:nav|footer)(?:__[a-z0-9-]+)?(?=$|[\s:\[.>+~])/', $part)) {
                     $problems[] = $part . ': not inside .ph-nav or .ph-footer';
+                } elseif (1 === preg_match('/^\.ph-(?:nav|footer)(?![\w-])[^\s>+~]*\s*[+~]/', $part)) {
+                    // A sibling of the nav or of the footer is outside them. A sibling inside them is allowed.
+                    $problems[] = $part . ': a sibling combinator leaves .ph-nav or .ph-footer';
                 }
             }
 
@@ -259,11 +268,21 @@ function commonProblems(string $css, array $tokens): array
                     continue;
                 }
 
-                $label = trim($selector) . ' ' . $name;
+                $label = preg_replace('/\s+/', ' ', trim($selector)) . ' ' . $name;
                 $plain = (string) preg_replace('/"[^"]*"|\'[^\']*\'/', '', $value);
 
                 if (1 === preg_match('/#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/i', $plain)) {
                     $problems[] = $label . ': a typed color';
+                }
+
+                // inherit is allowed. The other CSS-wide keywords give a color that is not a token.
+                $keyword = strtolower(trim($plain));
+
+                if (
+                    str_ends_with($name, 'color')
+                    && in_array($keyword, ['initial', 'revert', 'revert-layer', 'unset'], true)
+                ) {
+                    $problems[] = $label . ': ' . $keyword . ': not allowed for a color';
                 }
 
                 preg_match_all('/var\(\s*(--[a-z0-9-]+)/i', $plain, $variables);
@@ -276,12 +295,20 @@ function commonProblems(string $css, array $tokens): array
                     }
                 }
 
-                // A token name can have a color name in it, so the words come from the value without the token
-                // names. The fallback of a var() stays, because it can have a color name.
-                $words = (string) preg_replace('/var\(\s*--[a-z0-9-]+/i', '(', $plain);
-                preg_match_all('/(?<![a-z0-9-])[a-z]+(?![a-z0-9-])/i', $words, $found);
+                // The value of these properties is a list of property names, and some system colors have the
+                // name of a property (background).
+                if (in_array($name, ['transition', 'transition-property', 'will-change'], true)) {
+                    continue;
+                }
 
-                foreach (array_unique(array_intersect(array_map('strtolower', $found[0]), COLOR_NAMES)) as $color) {
+                // A token name can have a color name in it, so the words come from the value without the token
+                // names. The fallback of a var() stays, because it can have a color name. A word with "(" after it
+                // is a function (tan()), not a color.
+                $words = (string) preg_replace('/var\(\s*--[a-z0-9-]+/i', '(', $plain);
+                preg_match_all('/(?<![a-z0-9-])[a-z]+(?![a-z0-9(-])/i', $words, $found);
+                $colors = array_intersect(array_map('strtolower', $found[0]), [...COLOR_NAMES, ...SYSTEM_COLORS]);
+
+                foreach (array_unique($colors) as $color) {
                     $problems[] = $label . ': a color name: ' . $color;
                 }
             }

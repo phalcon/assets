@@ -1,10 +1,10 @@
 <?php
 
 /**
- * The color names of CSS, from the npm package color-name 2.1.1 (MIT
- * License). Do not change this file by hand: generate it again with the
- * command of the Phase 2 plan of the sites. transparent and currentcolor
- * are not here, because common.css can use them.
+ * The color names of CSS (npm package color-name 2.1.1, MIT License)
+ * and its system colors (npm package mdn-data 2.37.2, CC0 License), in
+ * lowercase. transparent and currentcolor are not here, because common.css can
+ * use them. Do not change this file by hand: run _tokens/color-names.mjs.
  */
 
 declare(strict_types=1);
@@ -28,4 +28,13 @@ const COLOR_NAMES = [
     'red', 'rosybrown', 'royalblue', 'saddlebrown', 'salmon', 'sandybrown', 'seagreen', 'seashell', 'sienna',
     'silver', 'skyblue', 'slateblue', 'slategray', 'slategrey', 'snow', 'springgreen', 'steelblue', 'tan', 'teal',
     'thistle', 'tomato', 'turquoise', 'violet', 'wheat', 'white', 'whitesmoke', 'yellow', 'yellowgreen',
+];
+
+const SYSTEM_COLORS = [
+    'accentcolor', 'accentcolortext', 'activeborder', 'activecaption', 'activetext', 'appworkspace', 'background',
+    'buttonborder', 'buttonface', 'buttonhighlight', 'buttonshadow', 'buttontext', 'canvas', 'canvastext',
+    'captiontext', 'field', 'fieldtext', 'graytext', 'highlight', 'highlighttext', 'inactiveborder',
+    'inactivecaption', 'inactivecaptiontext', 'infobackground', 'infotext', 'linktext', 'mark', 'marktext', 'menu',
+    'menutext', 'scrollbar', 'selecteditem', 'selecteditemtext', 'threeddarkshadow', 'threedface',
+    'threedhighlight', 'threedlightshadow', 'threedshadow', 'visitedtext', 'window', 'windowframe', 'windowtext',
 ];
