@@ -1,0 +1,219 @@
+import { strict as assert } from 'node:assert';
+import { readFileSync } from 'node:fs';
+import { test } from 'node:test';
+
+import {
+    codeThemeProblems,
+    definedCodeRoles,
+    definedTokens,
+    missingTokens,
+    resolveToken,
+    tokensProblems,
+    usedTokens,
+} from '../phalcon/tools/design-checks.mjs';
+
+const css = `/* A comment: --ph-fake: #000000; var(--ph-ghost) */
+:root {
+    --ph-night-950: #070d0c;
+    --ph-dark-bg: var(--ph-night-950);
+    --ph-loop-a: var(--ph-loop-b);
+    --ph-loop-b: var(--ph-loop-a);
+}
+`;
+
+/** A code theme that uses the roles bg, comment and text. $changes replaces top-level keys. */
+const theme = (changes = {}) => JSON.stringify({
+    colors: { 'editor.background': 'var(--code-bg)', 'editor.foreground': 'var(--code-text)' },
+    name: 'phalcon',
+    tokenColors: [
+        { scope: ['comment'], settings: { foreground: 'var(--code-comment)' } },
+        { scope: 'markup.underline', settings: { fontStyle: 'underline' } },
+    ],
+    type: 'dark',
+    ...changes,
+});
+
+// The tokens
+
+test('definedTokens lists the --ph- names that the rule defines', () => {
+    assert.deepEqual([...definedTokens(css)].sort(), ['--ph-dark-bg', '--ph-loop-a', '--ph-loop-b', '--ph-night-950']);
+});
+
+test('definedTokens ignores names in a comment', () => {
+    assert.ok(!definedTokens(css).has('--ph-fake'));
+});
+
+test('usedTokens finds var() references, also with spaces and a fallback', () => {
+    const text = 'a { color: var(--ph-one); background: var( --ph-two , red); }';
+
+    assert.deepEqual([...usedTokens(text)].sort(), ['--ph-one', '--ph-two']);
+});
+
+test('usedTokens ignores references in a comment', () => {
+    assert.deepEqual([...usedTokens(css)].sort(), ['--ph-loop-a', '--ph-loop-b', '--ph-night-950']);
+});
+
+test('missingTokens lists the used names that are not defined, sorted', () => {
+    assert.deepEqual(missingTokens(css, ['--ph-zeta', '--ph-dark-bg', '--ph-alpha']), ['--ph-alpha', '--ph-zeta']);
+});
+
+test('resolveToken follows var() references to the value', () => {
+    assert.equal(resolveToken(css, '--ph-dark-bg'), '#070d0c');
+    assert.equal(resolveToken(css, '--ph-night-950'), '#070d0c');
+});
+
+test('resolveToken returns null for an unknown name and for a loop', () => {
+    assert.equal(resolveToken(css, '--ph-nope'), null);
+    assert.equal(resolveToken(css, '--ph-loop-a'), null);
+});
+
+test('tokensProblems accepts a file that defines every used token', () => {
+    assert.deepEqual(tokensProblems(css, ['--ph-dark-bg']), []);
+});
+
+test('tokensProblems names each used token that is missing', () => {
+    assert.deepEqual(tokensProblems(css, ['--ph-dark-bg', '--ph-light-bg']), ['--ph-light-bg is missing']);
+});
+
+test('tokensProblems names a reference that the file does not define', () => {
+    const file = ':root { --ph-dark-bg: var(--ph-night-951); --ph-light-bg: #f7faf8; }';
+
+    assert.deepEqual(tokensProblems(file, ['--ph-light-bg']), ['--ph-night-951 is missing']);
+});
+
+test('tokensProblems names each used token that has no value', () => {
+    assert.deepEqual(tokensProblems(css, ['--ph-dark-bg', '--ph-loop-a']), ['--ph-loop-a has no value']);
+});
+
+test('tokensProblems rejects a file that is not a tokens file', () => {
+    const page = '<!DOCTYPE html><html><body>Not found</body></html>';
+
+    assert.deepEqual(tokensProblems(page, ['--ph-dark-bg']), ['the file has no :root rule']);
+    assert.deepEqual(tokensProblems('', ['--ph-dark-bg']), ['the file has no :root rule']);
+});
+
+test('tokensProblems accepts the value forms of a tokens file: hex, rgb(), var() and a font stack', () => {
+    const file = ':root {\n    --ph-a: #070d0c;\n    --ph-b: rgb(15 158 134 / 0.35);\n    --ph-c: var(--ph-a);\n'
+        + '    --ph-d: ui-monospace, "Liberation Mono",\n        monospace;\n}\n';
+
+    assert.deepEqual(tokensProblems(file, ['--ph-b', '--ph-c', '--ph-d']), []);
+});
+
+test('tokensProblems rejects a value that is not a color, a var() or a font stack', () => {
+    // A downloaded file goes into every page: a url() or an expression must not come in with it.
+    const file = ':root { --ph-a: #070d0c; --ph-b: url(https://example.com/t.png); }';
+
+    assert.deepEqual(tokensProblems(file, ['--ph-a']), [
+        '--ph-b: url(https://example.com/t.png) is not a token with a color, a var() or a font stack',
+    ]);
+});
+
+test('tokensProblems rejects a declaration that is not a --ph- token', () => {
+    const file = ':root { --ph-a: #070d0c; color: red; }';
+
+    assert.deepEqual(tokensProblems(file, ['--ph-a']), ['color: red is not a token with a color, a var() or a font stack']);
+});
+
+test('tokensProblems rejects a file with more than the :root rule, and a file that is cut', () => {
+    for (const file of [
+        ':root { --ph-a: #070d0c; }\nbody { display: none; }',
+        '@import url("https://example.com/x.css");\n:root { --ph-a: #070d0c; }',
+        ':root { --ph-a: #070d0c; --ph-b: #f7f',
+    ]) {
+        assert.deepEqual(tokensProblems(file, ['--ph-a']), ['the file is not a single :root rule'], file);
+    }
+});
+
+// The code theme
+
+test('codeThemeProblems accepts a theme whose roles the site maps', () => {
+    assert.deepEqual(codeThemeProblems(theme(), ['bg', 'comment', 'text']), []);
+});
+
+test('codeThemeProblems rejects a file that is not a JSON object', () => {
+    assert.deepEqual(codeThemeProblems('<!DOCTYPE html><html><body>Not found</body></html>', ['bg']), ['the file is not JSON']);
+    assert.deepEqual(codeThemeProblems('[]', ['bg']), ['the file is not a JSON object']);
+    assert.deepEqual(codeThemeProblems('', ['bg']), ['the file is not JSON']);
+});
+
+test('codeThemeProblems rejects a file with no rules', () => {
+    assert.deepEqual(codeThemeProblems(theme({ tokenColors: [] }), ['bg', 'comment', 'text']), ['the file has no list of rules']);
+});
+
+test('codeThemeProblems names a color that is not a --code- variable, and a role that the site does not map', () => {
+    const json = theme({
+        tokenColors: [
+            { scope: 'comment', settings: { foreground: 'red' } },
+            { scope: 'keyword', settings: { foreground: 'var(--code-keyword)' } },
+        ],
+    });
+
+    assert.deepEqual(codeThemeProblems(json, ['bg', 'text']), ['--code-keyword has no value on this site', 'red is not a --code- variable']);
+});
+
+test('codeThemeProblems checks the background of a rule as a color, and allows every other setting', () => {
+    const json = theme({
+        tokenColors: [
+            { scope: 'comment', settings: { background: 'red', fontStyle: 'italic', foreground: 'var(--code-comment)' } },
+            { scope: 'markup.inserted', settings: { background: 'var(--code-bg)' } },
+        ],
+    });
+
+    assert.deepEqual(codeThemeProblems(json, ['bg', 'comment', 'text']), ['red is not a --code- variable']);
+});
+
+test('codeThemeProblems names every typed color, in a rule and in the keys that Shiki also reads (bg, settings)', () => {
+    const json = theme({
+        bg: '#ff0000',
+        settings: [{ settings: { foreground: 'rgb(255 0 0)' } }],
+        tokenColors: [{ scope: 'comment', settings: { foreground: '#8b949e' } }],
+    });
+
+    assert.deepEqual(codeThemeProblems(json, ['bg', 'comment', 'text']), [
+        '#8b949e is a typed color',
+        '#ff0000 is a typed color',
+        'bg is not allowed',
+        'rgb(255 0 0) is a typed color',
+        'settings is not allowed',
+    ]);
+});
+
+test('codeThemeProblems allows only colors, name, tokenColors and type (Shiki reads fg and settings in their place)', () => {
+    const json = theme({ fg: 'var(--code-text)', settings: [{ settings: { foreground: 'var(--code-comment)' } }] });
+
+    assert.deepEqual(codeThemeProblems(json, ['bg', 'comment', 'text']), ['fg is not allowed', 'settings is not allowed']);
+});
+
+test('codeThemeProblems takes the --code- roles from the whole file', () => {
+    const json = theme({ bg: 'var(--code-unmapped)' });
+
+    assert.deepEqual(codeThemeProblems(json, ['bg', 'comment', 'text']), ['--code-unmapped has no value on this site', 'bg is not allowed']);
+});
+
+test('codeThemeProblems needs the two editor colors (Shiki falls back to typed colors)', () => {
+    assert.deepEqual(codeThemeProblems(theme({ colors: {} }), ['bg', 'comment', 'text']), [
+        'colors.editor.background is missing',
+        'colors.editor.foreground is missing',
+    ]);
+});
+
+test('definedCodeRoles reads the --code- roles that a stylesheet defines, not the ones in a comment', () => {
+    const text = '/* --code-ghost: red; */ :root { --code-bg: var(--ph-light-code-bg); color: var(--code-text); }';
+
+    assert.deepEqual([...definedCodeRoles(text)], ['bg']);
+});
+
+// The files of phalcon/assets: a change here must not stop the refresh of every site.
+
+test('the tokens file of phalcon/assets passes the check of the sites', () => {
+    const tokens = readFileSync(new URL('../phalcon/css/tokens.css', import.meta.url), 'utf8');
+
+    assert.deepEqual(tokensProblems(tokens, []), []);
+});
+
+test('the code theme of phalcon/assets passes the check of the sites', () => {
+    const json = readFileSync(new URL('../phalcon/css/code-theme.json', import.meta.url), 'utf8');
+    const roles = [...json.matchAll(/var\(--code-([a-z0-9-]+)\)/g)].map((match) => match[1]);
+
+    assert.deepEqual(codeThemeProblems(json, roles), []);
+});
