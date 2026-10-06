@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Tests for _tokens/functions.php, and the checks of phalcon/css/tokens.css and
- * phalcon/css/code-theme.json.
+ * Tests for _tokens/functions.php, and the checks of phalcon/css/tokens.css,
+ * phalcon/css/code-theme.json and phalcon/css/common.css.
  * Plain PHP, with no framework: each check prints one line, and the exit code
  * is 1 when a check fails.
  *
@@ -11,6 +11,7 @@
 
 declare(strict_types=1);
 
+require __DIR__ . '/../_tokens/color-names.php';
 require __DIR__ . '/../_tokens/functions.php';
 
 $results = [];
@@ -311,6 +312,110 @@ $check(
 );
 $check('scopeColor returns null for a scope that no rule names', null === scopeColor($scoped, 'nope'));
 
+// COLOR_NAMES (generated from the npm package color-name). The typed copy keeps
+// the static analysis from reading the checks as always true.
+/** @var list<string> $colorNames */
+$colorNames = COLOR_NAMES;
+$sortedNames = $colorNames;
+sort($sortedNames);
+$check('COLOR_NAMES has the 148 CSS color names, in order', 148 === count($colorNames) && $sortedNames === $colorNames);
+$check(
+    'COLOR_NAMES has white and rebeccapurple, and not transparent or currentcolor',
+    in_array('white', $colorNames, true)
+        && in_array('rebeccapurple', $colorNames, true)
+        && !in_array('transparent', $colorNames, true)
+        && !in_array('currentcolor', $colorNames, true)
+);
+
+// commonProblems
+$commonTokens = ['--ph-font-sans', '--ph-mist-100'];
+$common = static fn (string $extra = ''): string => "/* A comment can name #fff, rgb(0 0 0) and red. */\n"
+    . ".ph-nav { color: var(--ph-mist-100); font-family: var(--ph-font-sans); }\n"
+    . ".ph-nav__link:hover, .ph-footer :where(a) { color: transparent; }\n"
+    . "@media (min-width: 64rem) {\n    .ph-nav__links { display: flex; }\n}\n"
+    . "@media (hover: hover) {\n    .ph-nav__link:hover { color: currentcolor; }\n}\n"
+    . $extra;
+$commonFinds = static fn (string $css, string $needle): bool => str_contains(
+    implode("\n", commonProblems($css, $commonTokens)),
+    $needle
+);
+
+$check(
+    'commonProblems accepts a correct file (comments can name colors)',
+    [] === commonProblems($common(), $commonTokens)
+);
+$check('commonProblems rejects a hex color', $commonFinds($common(".ph-nav { color: #fff; }\n"), 'a typed color'));
+$check(
+    'commonProblems rejects an rgb() color',
+    $commonFinds($common(".ph-nav { color: rgb(0 0 0); }\n"), 'a typed color')
+);
+$check(
+    'commonProblems rejects a color name',
+    $commonFinds($common(".ph-nav { border-color: white; }\n"), 'a color name: white')
+);
+$check(
+    'commonProblems accepts a token that has a color name in it',
+    [] === commonProblems($common(".ph-nav { color: var(--ph-white); }\n"), [...$commonTokens, '--ph-white'])
+);
+$check(
+    'commonProblems rejects a color name in the fallback of a var()',
+    $commonFinds($common(".ph-nav { color: var(--ph-mist-100, white); }\n"), 'a color name: white')
+);
+$check(
+    'commonProblems rejects a color name in the fallback of a nested var()',
+    $commonFinds($common(".ph-nav { color: var(--ph-mist-100, var(--ph-font-sans, black)); }\n"), 'a color name: black')
+);
+$check(
+    'commonProblems rejects a token that tokens.css does not define',
+    $commonFinds($common(".ph-nav { color: var(--ph-nope); }\n"), '--ph-nope: not in tokens.css')
+);
+$check(
+    'commonProblems rejects a variable that is not a token',
+    $commonFinds($common(".ph-nav { box-shadow: var(--tw-shadow); }\n"), '--tw-shadow: not a --ph- token')
+);
+$check(
+    'commonProblems rejects a custom property definition',
+    $commonFinds($common(".ph-nav { --x: 1px; }\n"), '--x: defines a custom property')
+);
+$check(
+    'commonProblems rejects a selector outside the nav and the footer',
+    $commonFinds($common("a { color: inherit; }\n"), 'a: not inside .ph-nav or .ph-footer')
+);
+$check(
+    'commonProblems rejects a class that only starts like the nav',
+    $commonFinds($common(".ph-navigation { display: block; }\n"), '.ph-navigation: not inside .ph-nav or .ph-footer')
+);
+$check('commonProblems rejects @import', $commonFinds('@import "x.css";' . "\n" . $common(), '@import: not allowed'));
+$check(
+    'commonProblems rejects url()',
+    $commonFinds($common(".ph-nav { background-image: url(x.png); }\n"), 'url(): not allowed')
+);
+$check(
+    'commonProblems rejects another media query',
+    $commonFinds(
+        $common("@media (max-width: 10rem) {\n    .ph-nav { display: none; }\n}\n"),
+        '@media (max-width: 10rem): not allowed'
+    )
+);
+$check(
+    'commonProblems accepts the @supports block of color-mix()',
+    [] === commonProblems(
+        $common("@supports (color: color-mix(in lab, red, red)) {\n    .ph-nav { color: var(--ph-mist-100); }\n}\n"),
+        $commonTokens
+    )
+);
+$check(
+    'commonProblems rejects another @supports block',
+    $commonFinds(
+        $common("@supports (display: grid) {\n    .ph-nav { display: grid; }\n}\n"),
+        '@supports (display: grid): not allowed'
+    )
+);
+$check(
+    'commonProblems rejects another at-rule',
+    $commonFinds($common("@font-face { font-family: x; }\n"), '@font-face: an at-rule that is not allowed')
+);
+
 // phalcon/css/tokens.css
 $file = __DIR__ . '/../phalcon/css/tokens.css';
 $problems = is_file($file) ? tokenProblems((string) file_get_contents($file)) : ['the file is missing'];
@@ -363,6 +468,20 @@ foreach ($wrong as $line) {
 }
 
 $check("phalcon/css/code-theme.json gives GitHub's roles to the main scopes", [] === $wrong);
+
+// phalcon/css/common.css: the shared header and footer, on the tokens of tokens.css.
+$commonFile = __DIR__ . '/../phalcon/css/common.css';
+$tokenRules = parseRules(is_file($file) ? (string) file_get_contents($file) : '')['rules'];
+$defined = [] === $tokenRules ? [] : array_column(parseDeclarations($tokenRules[0]['body']), 'name');
+$problems = is_file($commonFile)
+    ? commonProblems((string) file_get_contents($commonFile), $defined)
+    : ['the file is missing'];
+
+foreach ($problems as $problem) {
+    echo 'common.css: ' . $problem . PHP_EOL;
+}
+
+$check('phalcon/css/common.css has no problems', [] === $problems);
 
 $failed = 0;
 

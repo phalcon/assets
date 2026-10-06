@@ -2,8 +2,9 @@
 
 /**
  * Pure functions for tests/tokens.php. They check phalcon/css/tokens.css, the
- * design tokens that every Phalcon site uses, and phalcon/css/code-theme.json,
- * the code theme that uses them. They read no files.
+ * design tokens that every Phalcon site uses, phalcon/css/code-theme.json, the
+ * code theme that uses them, and phalcon/css/common.css, the shared header and
+ * footer. They read no files.
  */
 
 declare(strict_types=1);
@@ -19,6 +20,12 @@ const CODE_SETTINGS = ['fontStyle', 'foreground'];
 
 /** A color of the code theme: var(--code-<role>). The match is the role. */
 const CODE_VAR_PATTERN = '/^var\(--code-([a-z0-9-]+)\)$/';
+
+/** The media queries that phalcon/css/common.css can use: the hover check and the breakpoints of phalcon.io. */
+const COMMON_MEDIA = ['(hover: hover)', '(min-width: 40rem)', '(min-width: 48rem)', '(min-width: 64rem)'];
+
+/** The @supports condition that phalcon/css/common.css can use: the color-mix() check of Tailwind. */
+const COMMON_SUPPORTS = ['(color: color-mix(in lab, red, red))'];
 
 /** The fonts that every site needs. */
 const FONT_TOKENS = ['--ph-font-mono', '--ph-font-sans'];
@@ -170,6 +177,114 @@ function codeThemeProblems(string $json, array $roles): array
             $problems[] = $label . ': foreground must be var(--code-<role>)';
         } elseif (!in_array($role, $roles, true)) {
             $problems[] = $label . ': --code-' . $role . ' has no syntax token in the tokens file';
+        }
+    }
+
+    return $problems;
+}
+
+/**
+ * Every problem in phalcon/css/common.css, the shared header and footer, one
+ * line each. $tokens are the names that tokens.css defines. An empty list
+ * means that the file is correct.
+ *
+ * The file is plain CSS with no nesting, except one level of the @media blocks
+ * of COMMON_MEDIA and the @supports blocks of COMMON_SUPPORTS. Each selector
+ * starts with .ph-nav or .ph-footer. A value
+ * takes its colors from the tokens: it has no typed color and no color name,
+ * and each var() is a token of tokens.css.
+ *
+ * @param list<string> $tokens
+ *
+ * @return list<string>
+ */
+function commonProblems(string $css, array $tokens): array
+{
+    $css = (string) preg_replace('~/\*.*?\*/~s', '', $css);
+    $problems = [];
+
+    if (str_contains($css, '@import')) {
+        $problems[] = '@import: not allowed';
+    }
+
+    if (1 === preg_match('/url\s*\(/i', $css)) {
+        $problems[] = 'url(): not allowed';
+    }
+
+    // The @media and @supports blocks come out first. Each one holds rules with no nesting.
+    $blocks = [];
+    $css = (string) preg_replace_callback(
+        '/@(media|supports)([^{]*)\{((?:[^{}]*\{[^{}]*\})*)\s*\}/',
+        static function (array $match) use (&$blocks, &$problems): string {
+            $condition = trim($match[2]);
+            $allowed = 'media' === $match[1] ? COMMON_MEDIA : COMMON_SUPPORTS;
+
+            if (!in_array($condition, $allowed, true)) {
+                $problems[] = '@' . $match[1] . ' ' . $condition . ': not allowed';
+            }
+
+            $blocks[] = $match[3];
+
+            return '';
+        },
+        $css
+    );
+
+    preg_match_all('/@[a-z-]+/i', $css, $atRules);
+
+    foreach (array_unique(array_diff($atRules[0], ['@import'])) as $atRule) {
+        $problems[] = $atRule . ': an at-rule that is not allowed';
+    }
+
+    foreach ([$css, ...$blocks] as $block) {
+        $parsed = parseRules($block);
+
+        if ('' !== $parsed['outside']) {
+            $problems[] = 'text outside a rule: ' . substr($parsed['outside'], 0, 40);
+        }
+
+        foreach ($parsed['rules'] as ['selector' => $selector, 'body' => $body]) {
+            foreach (preg_split('/,(?![^(]*\))/', $selector) ?: [] as $part) {
+                $part = trim($part);
+
+                if (1 !== preg_match('/^\.ph-(?:nav|footer)(?:__[a-z0-9-]+)?(?=$|[\s:\[.>+~])/', $part)) {
+                    $problems[] = $part . ': not inside .ph-nav or .ph-footer';
+                }
+            }
+
+            foreach (parseDeclarations($body) as ['name' => $name, 'value' => $value]) {
+                if (str_starts_with($name, '--')) {
+                    $problems[] = $name . ': defines a custom property';
+
+                    continue;
+                }
+
+                $label = trim($selector) . ' ' . $name;
+                $plain = (string) preg_replace('/"[^"]*"|\'[^\']*\'/', '', $value);
+
+                if (1 === preg_match('/#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/i', $plain)) {
+                    $problems[] = $label . ': a typed color';
+                }
+
+                preg_match_all('/var\(\s*(--[a-z0-9-]+)/i', $plain, $variables);
+
+                foreach ($variables[1] as $variable) {
+                    if (!str_starts_with($variable, '--ph-')) {
+                        $problems[] = $label . ': ' . $variable . ': not a --ph- token';
+                    } elseif (!in_array($variable, $tokens, true)) {
+                        $problems[] = $label . ': ' . $variable . ': not in tokens.css';
+                    }
+                }
+
+                // A token name can have a color name in it, so the words come from the value without the token
+                // names. The fallback of a var() stays, because it can have a color name.
+                $words = (string) preg_replace('/var\(\s*--[a-z0-9-]+/i', '(', $plain);
+                preg_match_all('/(?<![a-z0-9-])[a-z]+(?![a-z0-9-])/i', $words, $found);
+
+                foreach (array_unique(array_intersect(array_map('strtolower', $found[0]), COLOR_NAMES)) as $color) {
+                    $problems[] = $label . ': a color name: ' . $color;
+                }
+            }
         }
     }
 

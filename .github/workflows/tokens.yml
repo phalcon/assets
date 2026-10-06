@@ -1,7 +1,8 @@
-# Checks phalcon/css/tokens.css and phalcon/css/code-theme.json, the design
-# tokens and the code theme that every Phalcon site uses, when a file or its
-# checks change. The files change only by hand, so this workflow makes no
-# commit. Consumers read the files from https://assets.phalcon.io/phalcon/css/.
+# Checks phalcon/css/tokens.css, phalcon/css/code-theme.json and
+# phalcon/css/common.css, the design tokens, the code theme and the shared
+# header and footer that every Phalcon site uses, when a file or its checks
+# change. The files change only by hand, so this workflow makes no commit.
+# Consumers read the files from https://assets.phalcon.io/phalcon/css/.
 name: Check design tokens
 
 on:
@@ -11,6 +12,7 @@ on:
     paths:
       - phalcon/css/tokens.css
       - phalcon/css/code-theme.json
+      - phalcon/css/common.css
       - _tokens/**
       - tests/tokens.php
       - .github/workflows/tokens.yml
@@ -33,5 +35,5 @@ jobs:
         with:
           php-version: 8.4
 
-      - name: Check the tokens and the code theme
+      - name: Check the tokens, the code theme and common.css
         run: php tests/tokens.php
