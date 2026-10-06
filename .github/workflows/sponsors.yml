@@ -2,9 +2,9 @@
 # the hand-kept partner list, then commits it when it actually changed.
 #
 # The commit uses GITHUB_TOKEN, so it deliberately does not trigger other
-# workflows. Consumers read the file from raw.githubusercontent.com, which
-# serves it as soon as the commit lands; only new logo images under
-# phalcon/images/ need the Cloudflare Pages build to catch up.
+# workflows. Cloudflare Pages builds every push to master, so the file is on
+# https://assets.phalcon.io/phalcon/sponsors.json some minutes after the
+# commit. Consumers read it from there.
 name: Update sponsors
 
 on:

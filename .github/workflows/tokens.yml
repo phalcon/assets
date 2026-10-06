@@ -1,7 +1,7 @@
 # Checks phalcon/css/tokens.css and phalcon/css/code-theme.json, the design
 # tokens and the code theme that every Phalcon site uses, when a file or its
 # checks change. The files change only by hand, so this workflow makes no
-# commit. Consumers read the files from raw.githubusercontent.com.
+# commit. Consumers read the files from https://assets.phalcon.io/phalcon/css/.
 name: Check design tokens
 
 on:

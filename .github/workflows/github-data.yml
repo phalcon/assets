@@ -4,8 +4,9 @@
 #
 # It runs 30 minutes after the sponsors workflow. Both push to master, so this
 # one rebases before it pushes. The commit uses GITHUB_TOKEN, so it does not
-# trigger other workflows. Consumers read the files from
-# raw.githubusercontent.com, which serves them as soon as the commit lands.
+# trigger other workflows. Cloudflare Pages builds every push to master, so
+# the files are on https://assets.phalcon.io/phalcon/ some minutes after the
+# commit. Consumers read them from there.
 name: Update GitHub data
 
 on:
