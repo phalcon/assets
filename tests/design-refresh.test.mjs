@@ -145,6 +145,16 @@ test('refresh writes a copy that does not exist yet', async () => {
     assert.equal(readFileSync(copy, 'utf8'), 'new text');
 });
 
+test('refresh reports a missing copy when the new file has a problem and there is no copy', async () => {
+    const copy = join(work, 'never.css');
+    const { log, out } = lines();
+    const results = await refresh({ files: [{ copy, name: 'good.css', problems: () => ['a problem'] }], log, source });
+
+    assert.deepEqual(results, [{ copy, problems: ['a problem'], result: 'missing' }]);
+    assert.ok(!existsSync(copy));
+    assert.deepEqual(out, ['::warning title=Design tokens::good.css: a problem', `missing       ${copy}`]);
+});
+
 test('fromArgument gives the folder after --from, or null', () => {
     assert.equal(fromArgument(['--from', 'files']), 'files');
     assert.equal(fromArgument([]), null);
