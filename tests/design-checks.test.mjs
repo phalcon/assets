@@ -4,6 +4,7 @@ import { test } from 'node:test';
 
 import {
     codeThemeProblems,
+    commonCssProblems,
     definedCodeRoles,
     definedTokens,
     missingTokens,
@@ -203,6 +204,41 @@ test('definedCodeRoles reads the --code- roles that a stylesheet defines, not th
     assert.deepEqual([...definedCodeRoles(text)], ['bg']);
 });
 
+// The shared header and footer
+
+/** A small common.css that uses the tokens --ph-mist-100 and --ph-night-950. */
+const common = '/* The shared header and footer. */\n.ph-nav { color: var(--ph-mist-100); }\n'
+    + '.ph-footer { background-color: var(--ph-night-950); }\n';
+
+test('commonCssProblems accepts a file whose tokens the site defines', () => {
+    assert.deepEqual(commonCssProblems(common, `${css}:root { --ph-mist-100: #e6f2ec; }`), []);
+});
+
+test('commonCssProblems rejects a file that is not a stylesheet', () => {
+    assert.deepEqual(commonCssProblems('<!DOCTYPE html><html><body>Not found</body></html>', css), ['the file is not a stylesheet']);
+    assert.deepEqual(commonCssProblems('', css), ['the file is not a stylesheet']);
+});
+
+test('commonCssProblems rejects a stylesheet with no rules for the nav and the footer', () => {
+    assert.deepEqual(commonCssProblems('.header { color: var(--ph-night-950); }', css), ['the file has no rules for .ph-nav and .ph-footer']);
+});
+
+test('commonCssProblems rejects a file that is cut', () => {
+    assert.deepEqual(commonCssProblems(common.slice(0, -3), css), ['the file is not whole']);
+});
+
+test('commonCssProblems names each token that the tokens file does not define', () => {
+    const file = `${common}.ph-nav__bar { border-color: var(--ph-line-900); }\n`;
+
+    assert.deepEqual(commonCssProblems(file, css), ['--ph-line-900 is not in the tokens file', '--ph-mist-100 is not in the tokens file']);
+});
+
+test('commonCssProblems ignores tokens in a comment', () => {
+    const file = `/* var(--ph-ghost) */\n${common}`;
+
+    assert.deepEqual(commonCssProblems(file, `${css}:root { --ph-mist-100: #e6f2ec; }`), []);
+});
+
 // The files of phalcon/assets: a change here must not stop the refresh of every site.
 
 test('the tokens file of phalcon/assets passes the check of the sites', () => {
@@ -216,4 +252,11 @@ test('the code theme of phalcon/assets passes the check of the sites', () => {
     const roles = [...json.matchAll(/var\(--code-([a-z0-9-]+)\)/g)].map((match) => match[1]);
 
     assert.deepEqual(codeThemeProblems(json, roles), []);
+});
+
+test('the common.css of phalcon/assets passes the check of the sites, with the tokens file of phalcon/assets', () => {
+    const file = readFileSync(new URL('../phalcon/css/common.css', import.meta.url), 'utf8');
+    const tokens = readFileSync(new URL('../phalcon/css/tokens.css', import.meta.url), 'utf8');
+
+    assert.deepEqual(commonCssProblems(file, tokens), []);
 });
