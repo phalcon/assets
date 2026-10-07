@@ -7,6 +7,7 @@ import {
     commonCssProblems,
     definedCodeRoles,
     definedTokens,
+    footerProblems,
     missingTokens,
     resolveToken,
     tokensProblems,
@@ -272,4 +273,56 @@ test('the common.css of phalcon/assets passes the check of the sites, with the t
     const tokens = readFileSync(new URL('../phalcon/css/tokens.css', import.meta.url), 'utf8');
 
     assert.deepEqual(commonCssProblems(file, tokens), []);
+});
+
+const footer = {
+    tagline: 'A full-stack PHP framework.',
+    columns: [{ title: 'Framework', links: [{ label: 'Docs', href: 'https://docs.phalcon.io' }] }],
+    socials: [{ label: 'Telegram', href: 'https://phalcon.io/telegram' }],
+    copyright: 'Phalcon Team',
+};
+const footerWith = (change) => JSON.stringify({ ...footer, ...change });
+
+test('footerProblems accepts a footer with a tagline, columns, socials and a copyright', () => {
+    assert.deepEqual(footerProblems(JSON.stringify(footer)), []);
+});
+
+test('footerProblems rejects a file that is not a JSON object', () => {
+    assert.deepEqual(footerProblems('<!doctype html>'), ['the file is not JSON']);
+    assert.deepEqual(footerProblems('[]'), ['the file is not a JSON object']);
+    assert.deepEqual(footerProblems('null'), ['the file is not a JSON object']);
+});
+
+test('footerProblems rejects a key that a site does not read', () => {
+    assert.deepEqual(footerProblems(footerWith({ title: 'x' })), ['title is not allowed']);
+});
+
+test('footerProblems asks for the tagline and the copyright as text', () => {
+    assert.deepEqual(footerProblems(footerWith({ copyright: ' ', tagline: undefined })), ['copyright needs text', 'tagline needs text']);
+});
+
+test('footerProblems asks for columns with a title and links', () => {
+    assert.deepEqual(footerProblems(footerWith({ columns: [] })), ['columns needs at least one column']);
+    assert.deepEqual(
+        footerProblems(footerWith({ columns: [{ title: '', links: [] }] })),
+        ['columns[0] needs a title', 'columns[0].links needs at least one link'],
+    );
+});
+
+test('footerProblems asks for a label and an https:// address on each link, so that it works on every site', () => {
+    const problems = footerProblems(footerWith({
+        columns: [{ title: 'Project', links: [{ label: 'Team', href: '/team' }] }],
+        socials: [null, { label: '', href: 'https://phalcon.io/t' }, { label: 'X', href: 'javascript:alert(1)' }],
+    }));
+
+    assert.deepEqual(problems, [
+        'columns[0].links[0] needs a label and an https:// address',
+        'socials[0] needs a label and an https:// address',
+        'socials[1] needs a label and an https:// address',
+        'socials[2] needs a label and an https:// address',
+    ]);
+});
+
+test('footerProblems asks for at least one social link', () => {
+    assert.deepEqual(footerProblems(footerWith({ socials: [] })), ['socials needs at least one link']);
 });

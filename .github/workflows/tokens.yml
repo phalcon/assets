@@ -1,6 +1,7 @@
-# Checks phalcon/css/tokens.css, phalcon/css/code-theme.json and
-# phalcon/css/common.css, the design tokens, the code theme and the shared
-# header and footer that every Phalcon site uses, and phalcon/tools/, the
+# Checks phalcon/css/tokens.css, phalcon/css/code-theme.json,
+# phalcon/css/common.css and phalcon/footer.json, the design tokens, the code
+# theme, the shared header and footer and the footer links that every Phalcon
+# site uses, and phalcon/tools/, the
 # checks and the refresh that every site runs on them, when a file or its
 # checks change. The files change only by hand, so this workflow makes no
 # commit. Consumers read the files from https://assets.phalcon.io/phalcon/.
@@ -14,6 +15,7 @@ on:
       - phalcon/css/tokens.css
       - phalcon/css/code-theme.json
       - phalcon/css/common.css
+      - phalcon/footer.json
       - phalcon/tools/**
       - _tokens/**
       - tests/tokens.php
