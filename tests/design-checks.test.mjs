@@ -206,9 +206,12 @@ test('definedCodeRoles reads the --code- roles that a stylesheet defines, not th
 
 // The shared header and footer
 
+/** The last line of common.css. A file without it is cut. */
+const end = '/* The end of common.css. */\n';
+
 /** A small common.css that uses the tokens --ph-mist-100 and --ph-night-950. */
 const common = '/* The shared header and footer. */\n.ph-nav { color: var(--ph-mist-100); }\n'
-    + '.ph-footer { background-color: var(--ph-night-950); }\n';
+    + `.ph-footer { background-color: var(--ph-night-950); }\n${end}`;
 
 test('commonCssProblems accepts a file whose tokens the site defines', () => {
     assert.deepEqual(commonCssProblems(common, `${css}:root { --ph-mist-100: #e6f2ec; }`), []);
@@ -227,8 +230,18 @@ test('commonCssProblems rejects a file that is cut', () => {
     assert.deepEqual(commonCssProblems(common.slice(0, -3), css), ['the file is not whole']);
 });
 
+test('commonCssProblems rejects a file that is cut right after a rule', () => {
+    assert.deepEqual(commonCssProblems(common.replace(end, ''), css), ['the file is not whole']);
+});
+
+test('commonCssProblems accepts a < in valid CSS', () => {
+    const file = common.replace(end, `@media (width < 40rem) {\n    .ph-nav { display: none; }\n}\n${end}`);
+
+    assert.deepEqual(commonCssProblems(file, `${css}:root { --ph-mist-100: #e6f2ec; }`), []);
+});
+
 test('commonCssProblems names each token that the tokens file does not define', () => {
-    const file = `${common}.ph-nav__bar { border-color: var(--ph-line-900); }\n`;
+    const file = common.replace(end, `.ph-nav__bar { border-color: var(--ph-line-900); }\n${end}`);
 
     assert.deepEqual(commonCssProblems(file, css), ['--ph-line-900 is not in the tokens file', '--ph-mist-100 is not in the tokens file']);
 });
