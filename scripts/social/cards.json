@@ -1,0 +1,332 @@
+[
+    {
+        "file": "cphalcon",
+        "kicker": "Phalcon · C extension",
+        "name": "cphalcon",
+        "tagline": "the fastest PHP framework.",
+        "text": "High performance, full-stack PHP framework delivered as a C extension.",
+        "pills": [
+            "C extension · v5",
+            "Pure PHP · v6"
+        ],
+        "url": "github.com/phalcon/cphalcon"
+    },
+    {
+        "file": "phalcon",
+        "kicker": "Phalcon · Pure PHP",
+        "name": "phalcon",
+        "tagline": "the same API, in pure PHP.",
+        "text": "The Phalcon Framework as a PHP implementation: no extension to install.",
+        "pills": [
+            "Pure PHP · v6",
+            "C extension · v5"
+        ],
+        "url": "github.com/phalcon/phalcon"
+    },
+    {
+        "file": "docs",
+        "kicker": "Phalcon · Documentation",
+        "name": "documentation",
+        "tagline": "learn and build with Phalcon.",
+        "text": "The official documentation of the Phalcon Framework.",
+        "pills": [
+            "docs.phalcon.io",
+            "v5 · v6"
+        ],
+        "url": "github.com/phalcon/documentation"
+    },
+    {
+        "file": "blog",
+        "kicker": "Phalcon · Blog",
+        "name": "blog",
+        "tagline": "news, releases and stories.",
+        "text": "The blog of the Phalcon Framework.",
+        "pills": [
+            "blog.phalcon.io"
+        ],
+        "url": "github.com/phalcon/blog"
+    },
+    {
+        "file": "license",
+        "kicker": "Phalcon · License",
+        "name": "license",
+        "tagline": "the licenses of the framework.",
+        "text": "The licenses that govern the Phalcon Framework.",
+        "pills": [
+            "license.phalcon.io",
+            "BSD-3-Clause"
+        ],
+        "url": "github.com/phalcon/license"
+    },
+    {
+        "file": "assets",
+        "kicker": "Phalcon · Assets",
+        "name": "assets",
+        "tagline": "the files that the sites share.",
+        "text": "This repository holds all the assets that Phalcon sites use.",
+        "pills": [
+            "assets.phalcon.io"
+        ],
+        "url": "github.com/phalcon/assets"
+    },
+    {
+        "file": "builtwith",
+        "kicker": "Phalcon · Built with",
+        "name": "builtwith",
+        "tagline": "sites built with Phalcon.",
+        "text": "Websites built with the Phalcon Framework.",
+        "pills": [
+            "builtwith.phalcon.io"
+        ],
+        "url": "github.com/phalcon/builtwith"
+    },
+    {
+        "file": "main-site",
+        "kicker": "Phalcon · Website",
+        "name": "phalcon.io",
+        "tagline": "the home of Phalcon.",
+        "text": "The website of the Phalcon Framework.",
+        "pills": [
+            "phalcon.io"
+        ],
+        "url": "github.com/phalcon/phalcon.io"
+    },
+    {
+        "file": "vokuro",
+        "kicker": "Phalcon · Sample app",
+        "name": "vokuro",
+        "tagline": "a sample application.",
+        "text": "Sample application for the Phalcon Framework: ACL, authentication, security.",
+        "pills": [
+            "Sample app",
+            "Phalcon v5"
+        ],
+        "url": "github.com/phalcon/vokuro"
+    },
+    {
+        "file": "api",
+        "kicker": "Phalcon · Sample API",
+        "name": "rest-api",
+        "tagline": "an API application.",
+        "text": "Implementation of an API application with the Phalcon Framework.",
+        "pills": [
+            "Sample API",
+            "Phalcon v5"
+        ],
+        "url": "github.com/phalcon/rest-api"
+    },
+    {
+        "file": "invo",
+        "kicker": "Phalcon · Sample app",
+        "name": "invo",
+        "tagline": "invoicing, step by step.",
+        "text": "A sample invoicing application for the Phalcon Framework.",
+        "pills": [
+            "Sample app",
+            "Phalcon v5"
+        ],
+        "url": "github.com/phalcon/invo"
+    },
+    {
+        "file": "volt",
+        "kicker": "Phalcon · Templates",
+        "name": "volt",
+        "tagline": "the template engine.",
+        "text": "Phalcon Volt is an HTML template engine for server-side rendering.",
+        "pills": [
+            "Template engine",
+            "Pure PHP · v6"
+        ],
+        "url": "github.com/phalcon/volt"
+    },
+    {
+        "file": "vokuro-adr",
+        "kicker": "Phalcon · Sample app",
+        "name": "vokuro-adr",
+        "tagline": "Vokuro, the ADR way.",
+        "text": "Sample ADR application for the Phalcon Framework: ACL, authentication, security.",
+        "pills": [
+            "Sample app",
+            "ADR"
+        ],
+        "url": "github.com/phalcon/vokuro-adr"
+    },
+    {
+        "file": "crest",
+        "kicker": "Phalcon · Command line",
+        "name": "crest",
+        "tagline": "the command line of Phalcon.",
+        "text": "Command line application for the Phalcon Framework.",
+        "pills": [
+            "CLI"
+        ],
+        "url": "github.com/phalcon/crest"
+    },
+    {
+        "file": "bridge-psr3",
+        "kicker": "Phalcon · Bridge",
+        "name": "bridge-psr3",
+        "tagline": "PSR-3 for the logger.",
+        "text": "Connects the Phalcon logger and the PSR-3 standard, in both directions.",
+        "pills": [
+            "PSR-3",
+            "Logger"
+        ],
+        "url": "github.com/phalcon/bridge-psr3"
+    },
+    {
+        "file": "bridge-psr16",
+        "kicker": "Phalcon · Bridge",
+        "name": "bridge-psr16",
+        "tagline": "PSR-16 for the cache.",
+        "text": "Connects the Phalcon cache and the PSR-16 standard, in both directions.",
+        "pills": [
+            "PSR-16",
+            "Cache"
+        ],
+        "url": "github.com/phalcon/bridge-psr16"
+    },
+    {
+        "file": "quill",
+        "kicker": "Phalcon · Tools",
+        "name": "quill",
+        "tagline": "API documentation, generated.",
+        "text": "API documentation generator for Zephir and PHP sources.",
+        "pills": [
+            "Zephir",
+            "PHP"
+        ],
+        "url": "github.com/phalcon/quill"
+    },
+    {
+        "file": "bridge-psr11",
+        "kicker": "Phalcon · Bridge",
+        "name": "bridge-psr11",
+        "tagline": "PSR-11 for the container.",
+        "text": "Connects the Phalcon container and the PSR-11 standard, in both directions.",
+        "pills": [
+            "PSR-11",
+            "Container"
+        ],
+        "url": "github.com/phalcon/bridge-psr11"
+    },
+    {
+        "file": "debugbar",
+        "kicker": "Phalcon · Debug",
+        "name": "debugbar",
+        "tagline": "see inside each request.",
+        "text": "Web debug bar and debugger for the Phalcon Framework.",
+        "pills": [
+            "Debug bar"
+        ],
+        "url": "github.com/phalcon/debugbar"
+    },
+    {
+        "file": "phql",
+        "kicker": "Phalcon · PHQL",
+        "name": "phql",
+        "tagline": "the Phalcon Query Language.",
+        "text": "The parser of the Phalcon Query Language, in PHP.",
+        "pills": [
+            "Query language",
+            "Pure PHP · v6"
+        ],
+        "url": "github.com/phalcon/phql"
+    },
+    {
+        "file": "talon",
+        "kicker": "Phalcon · Testing",
+        "name": "talon",
+        "tagline": "tests for Phalcon apps.",
+        "text": "Test harness and Phalcon bootstrapping for PHPUnit and beyond.",
+        "pills": [
+            "PHPUnit",
+            "Testing"
+        ],
+        "url": "github.com/phalcon/talon"
+    },
+    {
+        "file": "tutorial",
+        "kicker": "Phalcon · Tutorial",
+        "name": "tutorial",
+        "tagline": "your first Phalcon app.",
+        "text": "The code of the Phalcon tutorial.",
+        "pills": [
+            "docs.phalcon.io",
+            "Tutorial"
+        ],
+        "url": "github.com/phalcon/tutorial"
+    },
+    {
+        "file": "traits",
+        "kicker": "Phalcon · Traits",
+        "name": "traits",
+        "tagline": "reusable building blocks.",
+        "text": "Reusable traits of the Phalcon Framework: used in v6, ready for your applications.",
+        "pills": [
+            "Pure PHP · v6",
+            "Helpers"
+        ],
+        "url": "github.com/phalcon/traits"
+    },
+    {
+        "file": "cli-options-parser",
+        "kicker": "Phalcon · Command line",
+        "name": "cli-options-parser",
+        "tagline": "arguments and options, parsed.",
+        "text": "Command line arguments and options parser for Phalcon applications.",
+        "pills": [
+            "CLI",
+            "Parser"
+        ],
+        "url": "github.com/phalcon/cli-options-parser"
+    },
+    {
+        "file": "ide-stubs",
+        "kicker": "Phalcon · IDE",
+        "name": "ide-stubs",
+        "tagline": "autocompletion for your IDE.",
+        "text": "Phalcon IDE stubs: autocompletion for the C extension.",
+        "pills": [
+            "C extension · v5",
+            "IDE"
+        ],
+        "url": "github.com/phalcon/ide-stubs"
+    },
+    {
+        "file": "migrations",
+        "kicker": "Phalcon · Database",
+        "name": "migrations",
+        "tagline": "your database, versioned.",
+        "text": "Generate or migrate database changes with migrations.",
+        "pills": [
+            "Database",
+            "CLI"
+        ],
+        "url": "github.com/phalcon/migrations"
+    },
+    {
+        "file": "code-quality",
+        "kicker": "Phalcon · Tooling",
+        "name": "code-quality",
+        "tagline": "one standard for all repositories.",
+        "text": "The code quality configuration files that the Phalcon repositories share.",
+        "pills": [
+            "PHPCS",
+            "PHPStan"
+        ],
+        "url": "github.com/phalcon/code-quality"
+    },
+    {
+        "file": "annotations",
+        "kicker": "Phalcon · Annotations",
+        "name": "annotations",
+        "tagline": "docblocks, parsed.",
+        "text": "Docblock annotations parser for the Phalcon Framework.",
+        "pills": [
+            "Parser",
+            "Pure PHP · v6"
+        ],
+        "url": "github.com/phalcon/annotations"
+    }
+]
