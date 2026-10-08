@@ -49,9 +49,9 @@
 .ph-side__title {
     color: var(--ph-light-kicker);
     font-family: var(--ph-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: 600;
-    height: 20px;
+    height: 1.25rem;
     letter-spacing: 0.14em;
     margin: 0 0 15px;
     text-transform: uppercase;
@@ -61,8 +61,9 @@
 
 .ph-side__text {
     color: var(--ph-light-muted);
-    font-size: 16px;
-    line-height: 23px;
+    font-size: 1rem;
+    line-height: 1.4375rem;
+    overflow-wrap: anywhere;
 }
 
 .ph-side__text a {

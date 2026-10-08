@@ -416,6 +416,21 @@ test('the sidebar.json of phalcon/assets passes the check of the sites', () => {
     assert.deepEqual(sidebarProblems(json), []);
 });
 
+test('the sidebar.css of phalcon/assets sets its text sizes in rem, so that they follow the default size of the reader', () => {
+    // A px size stays the same when the reader sets a larger default font size in the browser.
+    const file = readFileSync(new URL('../phalcon/css/sidebar.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    const px = [...file.matchAll(/(?:font-size|line-height|height)\s*:\s*[^;]*\dpx/g)].map((match) => match[0]);
+
+    assert.deepEqual(px, []);
+});
+
+test('the sidebar.css of phalcon/assets lets the projects text wrap a long word', () => {
+    // The text comes from sidebar.json; a long word or address must not make the page scroll sideways.
+    const file = readFileSync(new URL('../phalcon/css/sidebar.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+
+    assert.match(file, /\.ph-side__text\s*\{[^}]*overflow-wrap:\s*anywhere;/);
+});
+
 test('the footer.json of phalcon/assets links to the license site, last in the Framework column', () => {
     // phalcon.io has the same link in its own footer data (src/data/site.mjs).
     const data = JSON.parse(readFileSync(new URL('../phalcon/footer.json', import.meta.url), 'utf8'));

@@ -43,7 +43,7 @@ jobs:
         with:
           php-version: 8.4
 
-      - name: Check the tokens, the code theme and common.css
+      - name: Check the tokens, the code theme, common.css and sidebar.css
         run: php tests/tokens.php
 
       - name: Setup Node

@@ -47,7 +47,9 @@ const isToken = (declaration) => {
  * The problems of a shared stylesheet (common.css, sidebar.css) for a site: it
  * must be a stylesheet (no HTML), have rules for each of the classes, be whole
  * (each rule closed, and its last line `end`), and the site's tokens file must
- * define every token that it uses.
+ * define every token that it uses. It checks that a downloaded copy can replace
+ * the committed one; the content rules of the source file (the selectors, the
+ * colors, the at-rules) are in sharedCssProblems() of _tokens/functions.php.
  */
 const sharedCssProblems = (css, tokens, classes, end) => {
     const text = withoutComments(css).trim();
@@ -307,20 +309,29 @@ export function sidebarProblems(json) {
     const titles = ['projects', 'supporters']
         .filter((key) => !text(parsed[key]?.title))
         .map((key) => `${key}.title needs text`);
-    const groups = parsed.supporters?.groups;
-    const parts = parsed.projects?.text;
+    const isGroup = (group) => text(group?.group) && text(group?.title);
+    const isLink = (part) => text(part?.label) && /^https:\/\/\S+$/.test(String(part?.href));
+    const isPart = (part) => (typeof part === 'string' ? part !== '' : isLink(part));
+    // The problems of a list: one for each wrong item, or one when the list is missing or empty.
+    const list = (items, isItem, wrong, empty) => (Array.isArray(items) && items.length > 0
+        ? items.flatMap((item, index) => (isItem(item) ? [] : [wrong(index)]))
+        : [empty]);
 
     return [
         ...keys,
         ...titles,
-        ...(Array.isArray(groups) && groups.length > 0
-            ? groups.flatMap((group, index) => (text(group?.group) && text(group?.title) ? [] : [`supporters.groups[${index}] needs a group and a title`]))
-            : ['supporters.groups needs at least one group']),
-        ...(Array.isArray(parts) && parts.length > 0
-            ? parts.flatMap((part, index) => ((typeof part === 'string' ? part !== '' : text(part?.label) && /^https:\/\/\S+$/.test(String(part?.href)))
-                ? []
-                : [`projects.text[${index}] needs text, or a label and an https:// address`]))
-            : ['projects.text needs at least one part']),
+        ...list(
+            parsed.supporters?.groups,
+            isGroup,
+            (index) => `supporters.groups[${index}] needs a group and a title`,
+            'supporters.groups needs at least one group',
+        ),
+        ...list(
+            parsed.projects?.text,
+            isPart,
+            (index) => `projects.text[${index}] needs text, or a label and an https:// address`,
+            'projects.text needs at least one part',
+        ),
     ].sort();
 }
 

@@ -330,7 +330,10 @@ function scopeColor(array $rules, string $scope): ?string
  * selector starts with a block and does not go to a sibling of it. A value
  * takes its colors from the tokens: it has no typed color, no color name and
  * no system color, a color property is not initial, unset or revert, and each
- * var() is a token of tokens.css.
+ * var() is a token of tokens.css. These are the content rules of the source
+ * file; the check of a downloaded copy at the sites (a whole stylesheet with
+ * its classes and tokens) is sharedCssProblems() of
+ * phalcon/tools/design-checks.mjs.
  *
  * @param list<string> $tokens
  * @param list<string> $names
