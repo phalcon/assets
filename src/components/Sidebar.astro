@@ -1,0 +1,34 @@
+---
+/*
+ * The shared sidebar of the Phalcon sites: the box of the supporters and the
+ * box of the projects text, with the classes of public/phalcon/css/sidebar.css.
+ * The titles and the text come from public/phalcon/sidebar.json; the logos
+ * come from public/phalcon/sponsors.json (Sponsors.astro). This repository
+ * publishes the three files.
+ */
+import data from '../../public/phalcon/sidebar.json';
+import Sponsors from './Sponsors.astro';
+
+/*
+ * The form of sidebar.json that sidebarProblems() accepts. Without it, the
+ * type comes from the data of the copy: a correct file with other parts (for
+ * example, a text with no link) would then stop the type check.
+ */
+interface SidebarData {
+    projects: { text: (string | { href: string; label: string })[]; title: string };
+    supporters: { groups: { group: string; title: string }[]; title: string };
+}
+
+const sidebar: SidebarData = data;
+---
+
+<div class="ph-side__box">
+    <div class="ph-side__title">{sidebar.supporters.title}</div>
+    <Sponsors groups={sidebar.supporters.groups} />
+</div>
+<div class="ph-side__box">
+    <div class="ph-side__title">{sidebar.projects.title}</div>
+    <div class="ph-side__text">
+        {sidebar.projects.text.map((part) => (typeof part === 'string' ? part : <a href={part.href}>{part.label}</a>))}
+    </div>
+</div>

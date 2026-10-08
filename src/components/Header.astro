@@ -1,0 +1,172 @@
+---
+/*
+ * The shared nav of the Phalcon sites: the nav of phalcon.io, with the
+ * classes of public/phalcon/css/common.css, the shared stylesheet that this
+ * repository publishes. The stars come from public/phalcon/repositories.json
+ * (the GitHub data workflow updates it). The links are the links of phalcon.io, with absolute
+ * addresses. The site adds its theme switcher (next to the burger);
+ * public/css/site.css styles it. public/js/nav.js, a copy of the script of
+ * phalcon.io, opens and closes the mobile menu.
+ */
+import { cphalconStars, formatStars } from '../../public/phalcon/tools/stars.mjs';
+import repositories from '../../public/phalcon/repositories.json?raw';
+import { site } from '../site';
+
+const links = [
+    { label: 'Download', href: 'https://phalcon.io/download' },
+    { label: 'Docs', href: 'https://docs.phalcon.io' },
+    { label: 'Features', href: 'https://phalcon.io/#features' },
+];
+const menus = [
+    {
+        label: 'Community',
+        items: [
+            { label: 'Discord', href: 'https://phalcon.io/discord' },
+            { label: 'Discussions (v5)', href: 'https://github.com/phalcon/cphalcon/discussions' },
+            { label: 'Discussions (v6)', href: 'https://github.com/phalcon/phalcon/discussions' },
+            { label: 'Stack Overflow', href: 'https://phalcon.io/so' },
+            { label: 'Blog', href: 'https://phalcon.io/blog' },
+            { label: 'Support', href: 'https://phalcon.io/support' },
+        ],
+    },
+    {
+        label: 'Project',
+        items: [
+            { label: 'Contribute', href: 'https://phalcon.io/contribute' },
+            { label: 'Team', href: 'https://phalcon.io/team' },
+            { label: 'Testimonials', href: 'https://phalcon.io/testimonials' },
+            { label: 'Sponsors', href: 'https://phalcon.io/sponsors' },
+            { label: 'Hosting', href: 'https://phalcon.io/hosting' },
+            { label: 'Built with Phalcon', href: 'https://builtwith.phalcon.io' },
+        ],
+    },
+];
+const github = 'https://github.com/phalcon/cphalcon';
+/* A copy with no star count stops the build. The tests check the committed copy. */
+const stars = formatStars(cphalconStars(repositories));
+---
+
+<nav class="ph-nav">
+    <div class="ph-nav__bar">
+        <a href="/" class="ph-nav__brand">
+            <img src="https://assets.phalcon.io/phalcon/images/svg/falcon.svg" alt="" class="ph-nav__logo" />
+            <span class="ph-nav__name">{site.name}</span>
+        </a>
+
+        <div class="nav-end">
+            <div class="ph-nav__links">
+                {links.map((link) => (
+                    <a href={link.href} class="ph-nav__link">{link.label}</a>
+                ))}
+                {menus.map((menu) => (
+                    <div class="ph-nav__menu">
+                        <button class="ph-nav__menu-button" aria-haspopup="true">
+                            {menu.label} <span aria-hidden="true" class="ph-nav__caret">▾</span>
+                        </button>
+                        <div class="ph-nav__dropdown">
+                            <ul class="ph-nav__dropdown-list">
+                                {menu.items.map((item) => (
+                                    <li><a href={item.href} class="ph-nav__dropdown-link">{item.label}</a></li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                ))}
+                <a href={github} class="ph-nav__github">
+                    GitHub <span class="ph-nav__stars">★ {stars}</span>
+                </a>
+                <a href="https://phalcon.io/download" class="ph-nav__cta">Get Phalcon</a>
+            </div>
+
+            <div class="switcher"><button aria-label="Theme switcher"></button></div>
+
+            <button
+                id="nav-burger"
+                class="ph-nav__burger"
+                aria-label="Toggle navigation"
+                aria-expanded="false"
+                aria-controls="nav-mobile"
+            >
+                <span class="ph-nav__burger-line"></span>
+                <span class="ph-nav__burger-line"></span>
+                <span class="ph-nav__burger-line"></span>
+            </button>
+        </div>
+    </div>
+
+    <div id="nav-mobile" hidden class="ph-nav__mobile">
+        <ul class="ph-nav__mobile-list">
+            {links.map((link) => (
+                <li><a href={link.href} class="ph-nav__mobile-link">{link.label}</a></li>
+            ))}
+            {menus.map((menu) => (
+                <>
+                    <li class="ph-nav__mobile-heading">{menu.label}</li>
+                    {menu.items.map((item) => (
+                        <li><a href={item.href} class="ph-nav__mobile-link">{item.label}</a></li>
+                    ))}
+                </>
+            ))}
+            <li class="ph-nav__mobile-github">
+                <a href={github} class="ph-nav__mobile-link">GitHub ★ {stars}</a>
+            </li>
+            <li class="ph-nav__mobile-action">
+                <a href="https://phalcon.io/download" class="ph-nav__mobile-cta">Get Phalcon</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<script is:inline src="/js/nav.js" defer></script>
+
+<script>
+    /*
+     * The theme switcher, the same as the blog's (ported from the
+     * `theme.min.js` that `assets.phalcon.io` serves). From `auto` a click
+     * selects the tone the system is not on, and the click after that returns
+     * to `auto`.
+     *
+     * `Meta.astro` keeps a separate inline copy of the class switch. It has to
+     * run before the first paint, which a bundled module cannot do.
+     */
+    type Mode = 'auto' | 'dark' | 'light';
+    type Tone = 'dark' | 'light';
+
+    const root = document.documentElement;
+    const darkQuery = matchMedia('(prefers-color-scheme: dark)');
+
+    const systemTone = (): Tone => (darkQuery.matches ? 'dark' : 'light');
+    const storedMode = (): Mode => (localStorage.getItem('mode') as Mode | null) ?? 'auto';
+
+    const apply = (mode: Mode): void => {
+        const tone = mode === 'auto' ? systemTone() : mode;
+
+        root.style.colorScheme = mode === 'auto' ? 'light dark' : tone;
+        root.classList.remove('light', 'dark');
+        root.classList.add(tone);
+        localStorage.setItem('mode', mode);
+
+        /* site.css draws the moon and the sun on `.switcher-light`
+           and `.switcher-dark` with `::before`. */
+        document.querySelectorAll('.switcher').forEach((switcher) => {
+            switcher.classList.remove('switcher-light', 'switcher-dark');
+            switcher.classList.add(`switcher-${tone}`);
+        });
+    };
+
+    document.querySelectorAll('.switcher').forEach((switcher) => {
+        switcher.addEventListener('click', () => {
+            apply(storedMode() === 'auto'
+                ? (systemTone() === 'light' ? 'dark' : 'light')
+                : 'auto');
+        });
+    });
+
+    darkQuery.addEventListener('change', () => {
+        if (storedMode() === 'auto') {
+            apply('auto');
+        }
+    });
+
+    apply(storedMode());
+</script>

@@ -1,0 +1,49 @@
+---
+/*
+ * The page, ported from Jekyll's `_layouts/default.html`: the shared nav and
+ * footer (common.css), the main column and the sidebar. The fan art comment
+ * comes before `<html>`, as in the blog.
+ */
+import Analytics from '../components/Analytics.astro';
+import FanArt from '../components/FanArt.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Meta from '../components/Meta.astro';
+import Sidebar from '../components/Sidebar.astro';
+
+interface Props {
+    title?: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<FanArt />
+
+<html lang="en">
+<head>
+    <Meta title={title} />
+    <Analytics />
+</head>
+<body>
+<div class="header-sticky">
+    <Header />
+</div>
+
+<div class="page">
+    <div class="page__inner">
+        <main class="page__main">
+            <slot />
+        </main>
+        <aside class="page__side">
+            <Sidebar />
+        </aside>
+    </div>
+</div>
+{/* The footer is not a flex item of body itself, as on phalcon.io and the blog. */}
+<div>
+    <Footer />
+</div>
+</body>
+</html>

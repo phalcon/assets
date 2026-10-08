@@ -1,0 +1,79 @@
+---
+/*
+ * The head tags, ported from Jekyll's `_includes/meta.html` in the way of the
+ * blog's Meta.astro. The browser colors come from the design tokens
+ * (public/phalcon/css/tokens.css, the shared tokens that this repository
+ * publishes).
+ */
+import tokens from '../../public/phalcon/css/tokens.css?raw';
+import { resolveToken } from '../../public/phalcon/tools/design-checks.mjs';
+import { site } from '../site';
+
+interface Props {
+    title?: string;
+}
+
+const { title } = Astro.props;
+
+const pageTitle = title ? `${title} - ${site.name}` : `${site.name} - ${site.description}`;
+/* The build writes `index.html` and `404.html` (`build.format: 'file'`); the site serves `/` and `/404`. */
+const servedPath = Astro.url.pathname.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, '');
+const canonicalHref = new URL(servedPath, site.url).href;
+
+const brandColor = resolveToken(tokens, '--ph-brand-400');
+const tileColor = resolveToken(tokens, '--ph-dark-bg');
+---
+
+<title>{pageTitle}</title>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content={site.author}>
+<meta name="application-name" content={site.name}>
+<meta name="keywords" content={site.keywords}>
+<meta name="description" content={site.description}>
+
+<meta property="og:url" content={canonicalHref}>
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="website">
+<meta property="og:title" content={pageTitle}>
+<meta property="og:description" content={site.description}>
+<meta property="og:site_name" content={site.name}>
+<meta property="og:image" content={site.image}>
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content={pageTitle}>
+<meta name="twitter:description" content={site.description}>
+<meta name="twitter:image" content={site.image}>
+<meta name="twitter:image:alt" content={site.name}>
+<meta name="twitter:site" content={`@${site.social.twitter}`}>
+
+<link rel="canonical" href={canonicalHref}>
+<link rel="author" href="/humans.txt">
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://assets.phalcon.io/phalcon/favicons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://assets.phalcon.io/phalcon/favicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://assets.phalcon.io/phalcon/favicons/favicon-16x16.png">
+<link rel="icon" type="image/svg+xml" href="https://assets.phalcon.io/phalcon/favicons/favicon.svg">
+<link rel="icon" type="image/png" href="https://assets.phalcon.io/phalcon/favicons/favicon.png">
+<link rel="shortcut icon" type="image/x-icon" href="https://assets.phalcon.io/phalcon/favicons/favicon.ico">
+<link rel="mask-icon" href="https://assets.phalcon.io/phalcon/favicons/safari-pinned-tab.svg" color={brandColor}>
+<meta name="msapplication-config" content="https://assets.phalcon.io/phalcon/favicons/browserconfig.xml">
+<meta name="msapplication-TileColor" content={tileColor}>
+<meta name="theme-color" content={tileColor}>
+
+{/* The tone, set before the first paint so the page does not flash the wrong
+    one. The switcher in `Header.astro` runs as a module, which is deferred and
+    therefore too late for this. An unset `mode` reads as `auto`. */}
+<script is:inline>(function () { var mode = localStorage.getItem('mode') || 'auto'; document.documentElement.classList.add(mode === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : mode); })()</script>
+{/* The design tokens first: the other stylesheets use them. common.css is
+    the shared nav and footer and sidebar.css the shared sidebar (the shared
+    stylesheets that this repository publishes), and site.css has the rules
+    of this site. */}
+<link rel="stylesheet" href="/phalcon/css/tokens.css">
+<link rel="stylesheet" href="/phalcon/css/common.css">
+<link rel="stylesheet" href="/phalcon/css/sidebar.css">
+<link rel="stylesheet" href="/css/site.css">
