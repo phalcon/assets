@@ -2,7 +2,8 @@
 
 /**
  * Tests for _tokens/functions.php, and the checks of phalcon/css/tokens.css,
- * phalcon/css/code-theme.json and phalcon/css/common.css.
+ * phalcon/css/code-theme.json, phalcon/css/common.css and
+ * phalcon/css/sidebar.css.
  * Plain PHP, with no framework: each check prints one line, and the exit code
  * is 1 when a check fails.
  *
@@ -486,6 +487,67 @@ $check(
     'commonProblems puts a selector on one line in its messages',
     $commonFinds($common(".ph-nav,\n.ph-footer { color: white; }\n"), '.ph-nav, .ph-footer color: a color name: white')
 );
+$check(
+    'commonProblems rejects the dark tone of a site (the nav and the footer have one tone)',
+    $commonFinds(
+        $common("html.dark .ph-nav { color: inherit; }\n"),
+        'html.dark .ph-nav: not inside .ph-nav or .ph-footer'
+    )
+);
+
+// sidebarCssProblems
+$sidebar = static fn (string $extra = ''): string => "/* A comment can name #fff and red. */\n"
+    . ".ph-side__box { color: var(--ph-mist-100); }\n"
+    . "html.dark .ph-side__box { font-family: var(--ph-font-sans); }\n"
+    . ".ph-side__text a:hover { border-bottom-color: transparent; }\n"
+    . $extra;
+$sidebarFinds = static fn (string $css, string $needle): bool => str_contains(
+    implode("\n", sidebarCssProblems($css, $commonTokens)),
+    $needle
+);
+
+$check(
+    'sidebarCssProblems accepts a correct file with rules for the dark tone',
+    [] === sidebarCssProblems($sidebar(), $commonTokens)
+);
+$check(
+    'sidebarCssProblems rejects a selector outside the sidebar',
+    $sidebarFinds($sidebar(".ph-nav { color: inherit; }\n"), '.ph-nav: not inside .ph-side')
+);
+$check(
+    'sidebarCssProblems rejects a class that only starts like the sidebar',
+    $sidebarFinds($sidebar(".ph-sidebar { display: block; }\n"), '.ph-sidebar: not inside .ph-side')
+);
+$check(
+    'sidebarCssProblems rejects the dark tone of another block',
+    $sidebarFinds($sidebar("html.dark .ph-nav { color: inherit; }\n"), 'html.dark .ph-nav: not inside .ph-side')
+);
+$check(
+    'sidebarCssProblems rejects a @media block',
+    $sidebarFinds(
+        $sidebar("@media (hover: hover) {\n    .ph-side__box { color: inherit; }\n}\n"),
+        '@media (hover: hover): not allowed'
+    )
+);
+$check(
+    'sidebarCssProblems rejects a typed color',
+    $sidebarFinds($sidebar(".ph-side__text { color: #fff; }\n"), 'a typed color')
+);
+$check(
+    'sidebarCssProblems rejects a sibling of a box (a box has no root element)',
+    $sidebarFinds($sidebar(".ph-side__box + div { margin: 0; }\n"), '.ph-side__box + div: a sibling combinator leaves')
+);
+$check(
+    'sidebarCssProblems rejects a sibling of a box in the dark tone',
+    $sidebarFinds(
+        $sidebar("html.dark .ph-side__box:hover ~ * { color: inherit; }\n"),
+        'html.dark .ph-side__box:hover ~ *: a sibling combinator leaves'
+    )
+);
+$check(
+    'sidebarCssProblems accepts a sibling inside a box',
+    [] === sidebarCssProblems($sidebar(".ph-side__logo + .ph-side__logo { margin: 0; }\n"), $commonTokens)
+);
 
 // phalcon/css/tokens.css
 $file = __DIR__ . '/../phalcon/css/tokens.css';
@@ -553,6 +615,18 @@ foreach ($problems as $problem) {
 }
 
 $check('phalcon/css/common.css has no problems', [] === $problems);
+
+// phalcon/css/sidebar.css: the shared sidebar, on the tokens of tokens.css.
+$sidebarFile = __DIR__ . '/../phalcon/css/sidebar.css';
+$problems = is_file($sidebarFile)
+    ? sidebarCssProblems((string) file_get_contents($sidebarFile), $defined)
+    : ['the file is missing'];
+
+foreach ($problems as $problem) {
+    echo 'sidebar.css: ' . $problem . PHP_EOL;
+}
+
+$check('phalcon/css/sidebar.css has no problems', [] === $problems);
 
 $failed = 0;
 

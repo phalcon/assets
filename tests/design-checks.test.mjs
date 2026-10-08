@@ -10,6 +10,8 @@ import {
     footerProblems,
     missingTokens,
     resolveToken,
+    sidebarCssProblems,
+    sidebarProblems,
     tokensProblems,
     usedTokens,
 } from '../phalcon/tools/design-checks.mjs';
@@ -253,6 +255,80 @@ test('commonCssProblems ignores tokens in a comment', () => {
     assert.deepEqual(commonCssProblems(file, `${css}:root { --ph-mist-100: #e6f2ec; }`), []);
 });
 
+// The shared sidebar
+
+/** The last line of sidebar.css. A file without it is cut. */
+const sidebarEnd = '/* The end of sidebar.css. */\n';
+
+/** A small sidebar.css that uses the tokens --ph-night-950 and --ph-dark-bg, in both tones. */
+const sidebarCss = '/* The shared sidebar. */\n.ph-side__box { color: var(--ph-night-950); }\n'
+    + `html.dark .ph-side__box { color: var(--ph-dark-bg); }\n${sidebarEnd}`;
+
+test('sidebarCssProblems accepts a file whose tokens the site defines', () => {
+    assert.deepEqual(sidebarCssProblems(sidebarCss, css), []);
+});
+
+test('sidebarCssProblems rejects a file that is not a stylesheet', () => {
+    assert.deepEqual(sidebarCssProblems('<!DOCTYPE html><html><body>Not found</body></html>', css), ['the file is not a stylesheet']);
+});
+
+test('sidebarCssProblems rejects a stylesheet with no rule for the box', () => {
+    assert.deepEqual(sidebarCssProblems(common, css), ['the file has no rules for .ph-side__box']);
+});
+
+test('sidebarCssProblems rejects a file that is cut, or that ends as common.css', () => {
+    assert.deepEqual(sidebarCssProblems(sidebarCss.replace(sidebarEnd, ''), css), ['the file is not whole']);
+    assert.deepEqual(sidebarCssProblems(sidebarCss.replace(sidebarEnd, end), css), ['the file is not whole']);
+});
+
+test('sidebarCssProblems names each token that the tokens file does not define', () => {
+    const file = sidebarCss.replace(sidebarEnd, `.ph-side__title { color: var(--ph-light-kicker); }\n${sidebarEnd}`);
+
+    assert.deepEqual(sidebarCssProblems(file, css), ['--ph-light-kicker is not in the tokens file']);
+});
+
+const sidebar = {
+    supporters: { title: 'Supporters', groups: [{ group: 'sponsor', title: 'Sponsors' }] },
+    projects: { title: 'Projects', text: ['We make ', { label: 'Phalcon', href: 'https://phalcon.io' }, '.'] },
+};
+const sidebarWith = (change) => JSON.stringify({ ...sidebar, ...change });
+
+test('sidebarProblems accepts the box of the supporters and the box of the projects', () => {
+    assert.deepEqual(sidebarProblems(JSON.stringify(sidebar)), []);
+});
+
+test('sidebarProblems rejects a file that is not a JSON object', () => {
+    assert.deepEqual(sidebarProblems('<!doctype html>'), ['the file is not JSON']);
+    assert.deepEqual(sidebarProblems('[]'), ['the file is not a JSON object']);
+});
+
+test('sidebarProblems rejects a key that a site does not read', () => {
+    assert.deepEqual(sidebarProblems(sidebarWith({ tags: {} })), ['tags is not allowed']);
+});
+
+test('sidebarProblems asks for the titles and for groups of supporters with a group and a title', () => {
+    assert.deepEqual(
+        sidebarProblems(sidebarWith({ supporters: { title: '', groups: [] }, projects: { ...sidebar.projects, title: ' ' } })),
+        ['projects.title needs text', 'supporters.groups needs at least one group', 'supporters.title needs text'],
+    );
+    assert.deepEqual(
+        sidebarProblems(sidebarWith({ supporters: { title: 'Supporters', groups: [{ group: 'sponsor' }] } })),
+        ['supporters.groups[0] needs a group and a title'],
+    );
+});
+
+test('sidebarProblems asks for text parts, and for a label and an https:// address on each link', () => {
+    assert.deepEqual(sidebarProblems(sidebarWith({ projects: { title: 'Projects', text: [] } })), ['projects.text needs at least one part']);
+    assert.deepEqual(
+        sidebarProblems(sidebarWith({ projects: { title: 'Projects', text: ['', { label: 'Team', href: '/team' }, 7] } })),
+        [
+            'projects.text[0] needs text, or a label and an https:// address',
+            'projects.text[1] needs text, or a label and an https:// address',
+            'projects.text[2] needs text, or a label and an https:// address',
+        ],
+    );
+});
+
 // The files of phalcon/assets: a change here must not stop the refresh of every site.
 
 test('the tokens file of phalcon/assets passes the check of the sites', () => {
@@ -325,4 +401,25 @@ test('footerProblems asks for a label and an https:// address on each link, so t
 
 test('footerProblems asks for at least one social link', () => {
     assert.deepEqual(footerProblems(footerWith({ socials: [] })), ['socials needs at least one link']);
+});
+
+test('the sidebar.css of phalcon/assets passes the check of the sites, with the tokens file of phalcon/assets', () => {
+    const file = readFileSync(new URL('../phalcon/css/sidebar.css', import.meta.url), 'utf8');
+    const tokens = readFileSync(new URL('../phalcon/css/tokens.css', import.meta.url), 'utf8');
+
+    assert.deepEqual(sidebarCssProblems(file, tokens), []);
+});
+
+test('the sidebar.json of phalcon/assets passes the check of the sites', () => {
+    const json = readFileSync(new URL('../phalcon/sidebar.json', import.meta.url), 'utf8');
+
+    assert.deepEqual(sidebarProblems(json), []);
+});
+
+test('the footer.json of phalcon/assets links to the license site, last in the Framework column', () => {
+    // phalcon.io has the same link in its own footer data (src/data/site.mjs).
+    const data = JSON.parse(readFileSync(new URL('../phalcon/footer.json', import.meta.url), 'utf8'));
+    const framework = data.columns.find((column) => column.title === 'Framework');
+
+    assert.deepEqual(framework.links.at(-1), { href: 'https://license.phalcon.io', label: 'License' });
 });

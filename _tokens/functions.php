@@ -3,8 +3,8 @@
 /**
  * Pure functions for tests/tokens.php. They check phalcon/css/tokens.css, the
  * design tokens that every Phalcon site uses, phalcon/css/code-theme.json, the
- * code theme that uses them, and phalcon/css/common.css, the shared header and
- * footer. They read no files.
+ * code theme that uses them, phalcon/css/common.css, the shared header and
+ * footer, and phalcon/css/sidebar.css, the shared sidebar. They read no files.
  */
 
 declare(strict_types=1);
@@ -202,120 +202,7 @@ function codeThemeProblems(string $json, array $roles): array
  */
 function commonProblems(string $css, array $tokens): array
 {
-    $css = (string) preg_replace('~/\*.*?\*/~s', '', $css);
-    $problems = [];
-
-    if (str_contains($css, '@import')) {
-        $problems[] = '@import: not allowed';
-    }
-
-    if (1 === preg_match('/url\s*\(/i', $css)) {
-        $problems[] = 'url(): not allowed';
-    }
-
-    if (1 === preg_match('/image-set\s*\(/i', $css)) {
-        $problems[] = 'image-set(): not allowed';
-    }
-
-    // The @media and @supports blocks come out first. Each one holds rules with no nesting.
-    $blocks = [];
-    $css = (string) preg_replace_callback(
-        '/@(media|supports)([^{]*)\{((?:[^{}]*\{[^{}]*\})*)\s*\}/',
-        static function (array $match) use (&$blocks, &$problems): string {
-            $condition = trim($match[2]);
-            $allowed = 'media' === $match[1] ? COMMON_MEDIA : COMMON_SUPPORTS;
-
-            if (!in_array($condition, $allowed, true)) {
-                $problems[] = '@' . $match[1] . ' ' . $condition . ': not allowed';
-            }
-
-            $blocks[] = $match[3];
-
-            return '';
-        },
-        $css
-    );
-
-    preg_match_all('/@[a-z-]+/i', $css, $atRules);
-
-    foreach (array_unique(array_diff($atRules[0], ['@import'])) as $atRule) {
-        $problems[] = $atRule . ': an at-rule that is not allowed';
-    }
-
-    foreach ([$css, ...$blocks] as $block) {
-        $parsed = parseRules($block);
-
-        if ('' !== $parsed['outside']) {
-            $problems[] = 'text outside a rule: ' . substr($parsed['outside'], 0, 40);
-        }
-
-        foreach ($parsed['rules'] as ['selector' => $selector, 'body' => $body]) {
-            foreach (preg_split('/,(?![^(]*\))/', $selector) ?: [] as $part) {
-                $part = (string) preg_replace('/\s+/', ' ', trim($part));
-
-                if (1 !== preg_match('/^\.ph-(?:nav|footer)(?:__[a-z0-9-]+)?(?=$|[\s:\[.>+~])/', $part)) {
-                    $problems[] = $part . ': not inside .ph-nav or .ph-footer';
-                } elseif (1 === preg_match('/^\.ph-(?:nav|footer)(?![\w-])[^\s>+~]*\s*[+~]/', $part)) {
-                    // A sibling of the nav or of the footer is outside them. A sibling inside them is allowed.
-                    $problems[] = $part . ': a sibling combinator leaves .ph-nav or .ph-footer';
-                }
-            }
-
-            foreach (parseDeclarations($body) as ['name' => $name, 'value' => $value]) {
-                if (str_starts_with($name, '--')) {
-                    $problems[] = $name . ': defines a custom property';
-
-                    continue;
-                }
-
-                $label = preg_replace('/\s+/', ' ', trim($selector)) . ' ' . $name;
-                $plain = (string) preg_replace('/"[^"]*"|\'[^\']*\'/', '', $value);
-
-                if (1 === preg_match('/#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/i', $plain)) {
-                    $problems[] = $label . ': a typed color';
-                }
-
-                // inherit is allowed. The other CSS-wide keywords give a color that is not a token.
-                $keyword = strtolower(trim($plain));
-
-                if (
-                    str_ends_with($name, 'color')
-                    && in_array($keyword, ['initial', 'revert', 'revert-layer', 'unset'], true)
-                ) {
-                    $problems[] = $label . ': ' . $keyword . ': not allowed for a color';
-                }
-
-                preg_match_all('/var\(\s*(--[a-z0-9-]+)/i', $plain, $variables);
-
-                foreach ($variables[1] as $variable) {
-                    if (!str_starts_with($variable, '--ph-')) {
-                        $problems[] = $label . ': ' . $variable . ': not a --ph- token';
-                    } elseif (!in_array($variable, $tokens, true)) {
-                        $problems[] = $label . ': ' . $variable . ': not in tokens.css';
-                    }
-                }
-
-                // The value of these properties is a list of property names, and some system colors have the
-                // name of a property (background).
-                if (in_array($name, ['transition', 'transition-property', 'will-change'], true)) {
-                    continue;
-                }
-
-                // A token name can have a color name in it, so the words come from the value without the token
-                // names. The fallback of a var() stays, because it can have a color name. A word with "(" after it
-                // is a function (tan()), not a color.
-                $words = (string) preg_replace('/var\(\s*--[a-z0-9-]+/i', '(', $plain);
-                preg_match_all('/(?<![a-z0-9-])[a-z]+(?![a-z0-9(-])/i', $words, $found);
-                $colors = array_intersect(array_map('strtolower', $found[0]), [...COLOR_NAMES, ...SYSTEM_COLORS]);
-
-                foreach (array_unique($colors) as $color) {
-                    $problems[] = $label . ': a color name: ' . $color;
-                }
-            }
-        }
-    }
-
-    return $problems;
+    return sharedCssProblems($css, $tokens, ['nav', 'footer'], COMMON_MEDIA, COMMON_SUPPORTS, false);
 }
 
 /**
@@ -429,6 +316,171 @@ function scopeColor(array $rules, string $scope): ?string
     }
 
     return $color;
+}
+
+/**
+ * Every problem in a shared stylesheet of the sites (common.css, sidebar.css),
+ * one line each. $tokens are the names that tokens.css defines; $names are the
+ * blocks (nav, footer: .ph-nav, .ph-footer); $media and $supports are the
+ * conditions that its @media and @supports blocks can have; with $darkTone, a
+ * selector can also start with html.dark (the dark tone of a site).
+ *
+ * The file is plain CSS with no nesting, except one level of the @media and
+ * @supports blocks. It loads no file (no @import, url() or image-set()). Each
+ * selector starts with a block and does not go to a sibling of it. A value
+ * takes its colors from the tokens: it has no typed color, no color name and
+ * no system color, a color property is not initial, unset or revert, and each
+ * var() is a token of tokens.css.
+ *
+ * @param list<string> $tokens
+ * @param list<string> $names
+ * @param list<string> $media
+ * @param list<string> $supports
+ *
+ * @return list<string>
+ */
+function sharedCssProblems(
+    string $css,
+    array $tokens,
+    array $names,
+    array $media,
+    array $supports,
+    bool $darkTone
+): array {
+    $prefix = $darkTone ? '(?:html\.dark )?' : '';
+    $blockPattern = '\.ph-(?:' . implode('|', $names) . ')';
+    $where = implode(' or ', array_map(static fn (string $name): string => '.ph-' . $name, $names));
+    $css = (string) preg_replace('~/\*.*?\*/~s', '', $css);
+    $problems = [];
+
+    if (str_contains($css, '@import')) {
+        $problems[] = '@import: not allowed';
+    }
+
+    if (1 === preg_match('/url\s*\(/i', $css)) {
+        $problems[] = 'url(): not allowed';
+    }
+
+    if (1 === preg_match('/image-set\s*\(/i', $css)) {
+        $problems[] = 'image-set(): not allowed';
+    }
+
+    // The @media and @supports blocks come out first. Each one holds rules with no nesting.
+    $blocks = [];
+    $css = (string) preg_replace_callback(
+        '/@(media|supports)([^{]*)\{((?:[^{}]*\{[^{}]*\})*)\s*\}/',
+        static function (array $match) use (&$blocks, &$problems, $media, $supports): string {
+            $condition = trim($match[2]);
+            $allowed = 'media' === $match[1] ? $media : $supports;
+
+            if (!in_array($condition, $allowed, true)) {
+                $problems[] = '@' . $match[1] . ' ' . $condition . ': not allowed';
+            }
+
+            $blocks[] = $match[3];
+
+            return '';
+        },
+        $css
+    );
+
+    preg_match_all('/@[a-z-]+/i', $css, $atRules);
+
+    foreach (array_unique(array_diff($atRules[0], ['@import'])) as $atRule) {
+        $problems[] = $atRule . ': an at-rule that is not allowed';
+    }
+
+    foreach ([$css, ...$blocks] as $block) {
+        $parsed = parseRules($block);
+
+        if ('' !== $parsed['outside']) {
+            $problems[] = 'text outside a rule: ' . substr($parsed['outside'], 0, 40);
+        }
+
+        foreach ($parsed['rules'] as ['selector' => $selector, 'body' => $body]) {
+            foreach (preg_split('/,(?![^(]*\))/', $selector) ?: [] as $part) {
+                $part = (string) preg_replace('/\s+/', ' ', trim($part));
+
+                if (1 !== preg_match('/^' . $prefix . $blockPattern . '(?:__[a-z0-9-]+)?(?=$|[\s:\[.>+~])/', $part)) {
+                    $problems[] = $part . ': not inside ' . $where;
+                } elseif (1 === preg_match('/^' . $prefix . $blockPattern . '(?![\w-])[^\s>+~]*\s*[+~]/', $part)) {
+                    // A sibling of a block is outside it. A sibling inside the block is allowed.
+                    $problems[] = $part . ': a sibling combinator leaves ' . $where;
+                }
+            }
+
+            foreach (parseDeclarations($body) as ['name' => $name, 'value' => $value]) {
+                if (str_starts_with($name, '--')) {
+                    $problems[] = $name . ': defines a custom property';
+
+                    continue;
+                }
+
+                $label = preg_replace('/\s+/', ' ', trim($selector)) . ' ' . $name;
+                $plain = (string) preg_replace('/"[^"]*"|\'[^\']*\'/', '', $value);
+
+                if (1 === preg_match('/#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/i', $plain)) {
+                    $problems[] = $label . ': a typed color';
+                }
+
+                // inherit is allowed. The other CSS-wide keywords give a color that is not a token.
+                $keyword = strtolower(trim($plain));
+
+                if (
+                    str_ends_with($name, 'color')
+                    && in_array($keyword, ['initial', 'revert', 'revert-layer', 'unset'], true)
+                ) {
+                    $problems[] = $label . ': ' . $keyword . ': not allowed for a color';
+                }
+
+                preg_match_all('/var\(\s*(--[a-z0-9-]+)/i', $plain, $variables);
+
+                foreach ($variables[1] as $variable) {
+                    if (!str_starts_with($variable, '--ph-')) {
+                        $problems[] = $label . ': ' . $variable . ': not a --ph- token';
+                    } elseif (!in_array($variable, $tokens, true)) {
+                        $problems[] = $label . ': ' . $variable . ': not in tokens.css';
+                    }
+                }
+
+                // The value of these properties is a list of property names, and some system colors have the
+                // name of a property (background).
+                if (in_array($name, ['transition', 'transition-property', 'will-change'], true)) {
+                    continue;
+                }
+
+                // A token name can have a color name in it, so the words come from the value without the token
+                // names. The fallback of a var() stays, because it can have a color name. A word with "(" after it
+                // is a function (tan()), not a color.
+                $words = (string) preg_replace('/var\(\s*--[a-z0-9-]+/i', '(', $plain);
+                preg_match_all('/(?<![a-z0-9-])[a-z]+(?![a-z0-9(-])/i', $words, $found);
+                $colors = array_intersect(array_map('strtolower', $found[0]), [...COLOR_NAMES, ...SYSTEM_COLORS]);
+
+                foreach (array_unique($colors) as $color) {
+                    $problems[] = $label . ': a color name: ' . $color;
+                }
+            }
+        }
+    }
+
+    return $problems;
+}
+
+/**
+ * Every problem in phalcon/css/sidebar.css, the shared sidebar, one line each:
+ * the problems of sharedCssProblems(), with the blocks .ph-side and
+ * .ph-side__box, no @media or @supports block, and the dark tone (html.dark).
+ * The boxes have no root element, so each box is a block: a selector cannot
+ * go to a sibling of a box. $tokens are the names that tokens.css defines. An
+ * empty list means that the file is correct.
+ *
+ * @param list<string> $tokens
+ *
+ * @return list<string>
+ */
+function sidebarCssProblems(string $css, array $tokens): array
+{
+    return sharedCssProblems($css, $tokens, ['side', 'side__box'], [], [], true);
 }
 
 /**

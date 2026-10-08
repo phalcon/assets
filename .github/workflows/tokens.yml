@@ -1,10 +1,11 @@
 # Checks phalcon/css/tokens.css, phalcon/css/code-theme.json,
-# phalcon/css/common.css and phalcon/footer.json, the design tokens, the code
-# theme, the shared header and footer and the footer links that every Phalcon
-# site uses, and phalcon/tools/, the
-# checks and the refresh that every site runs on them, when a file or its
-# checks change. The files change only by hand, so this workflow makes no
-# commit. Consumers read the files from https://assets.phalcon.io/phalcon/.
+# phalcon/css/common.css, phalcon/footer.json, phalcon/css/sidebar.css and
+# phalcon/sidebar.json, the design tokens, the code theme, the shared header
+# and footer, the footer links and the shared sidebar that the Phalcon sites
+# use, and phalcon/tools/, the checks and the refresh that every site runs on
+# them, when a file or its checks change. The files change only by hand, so
+# this workflow makes no commit. Consumers read the files from
+# https://assets.phalcon.io/phalcon/.
 name: Check design tokens
 
 on:
@@ -16,6 +17,8 @@ on:
       - phalcon/css/code-theme.json
       - phalcon/css/common.css
       - phalcon/footer.json
+      - phalcon/css/sidebar.css
+      - phalcon/sidebar.json
       - phalcon/tools/**
       - _tokens/**
       - tests/tokens.php
