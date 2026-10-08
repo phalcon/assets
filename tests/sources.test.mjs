@@ -100,9 +100,10 @@ test('the CI workflow publishes the build to the production branch, which Cloudf
     assert.match(workflow, /branches-ignore:\n\s+- production/);
 });
 
-test('the CI workflow runs one deploy at a time, as phalcon.io does', () => {
+test('the CI workflow runs one deploy at a time on each branch, as phalcon.io does', () => {
     // Two runs close together (a push and a data workflow) must not let the older build publish last.
-    assert.match(read('.github/workflows/main.yml'), /\nconcurrency:\n {2}group: deploy\n {2}cancel-in-progress: false\n/);
+    // A group keeps only one waiting run, so a pull request run must not cancel a waiting master run.
+    assert.match(read('.github/workflows/main.yml'), /\nconcurrency:\n {2}group: deploy-\$\{\{ github\.ref \}\}\n {2}cancel-in-progress: false\n/);
 });
 
 test('sidebar.css has a rule for every ph-side class that the sidebar uses', () => {
