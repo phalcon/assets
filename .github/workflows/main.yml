@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    # Every branch runs the checks. `production` carries the built site only,
+    # with no package.json, so the deploy push must not start a run.
+    branches-ignore:
+      - production
+  pull_request:
+  workflow_dispatch:
+  # The data workflows commit with GITHUB_TOKEN, which starts no workflow. A
+  # run after each of them publishes their new data.
+  workflow_run:
+    workflows:
+      - Update sponsors
+      - Update GitHub data
+    types:
+      - completed
+    branches:
+      - master
+
+# The deploy step pushes the built site to another branch.
+permissions:
+  contents: write
+
+# Two runs must not publish at the same time: a run waits for the one before it.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  # The branch Cloudflare Pages serves. It holds the built site only.
+  DEPLOY_BRANCH: production
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: 8.4
+          tools: phpcs:4.0.4, phpstan:2.2.16
+
+      - name: Check the PHP code style (PSR-12, phpcs.xml)
+        run: phpcs
+
+      - name: Check the PHP types (PHPStan, level max, phpstan.neon)
+        run: phpstan analyse --no-progress
+
+      - name: Check the tokens, the code theme, common.css and sidebar.css
+        # The shared files of public/phalcon/css/: the PHP checks of
+        # scripts/tokens/ (the content rules of the source files).
+        run: php tests/tokens.php
+
+      - name: Check the rules of the GitHub data
+        run: php tests/github.php
+
+      - name: Check the rules of the sponsors roster
+        run: php tests/sponsors.php
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Check types
+        run: npx astro check
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify the build
+        run: npm run verify
+
+      - name: Publish to the deploy branch
+        if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+        run: |
+          git config user.name niden
+          git config user.email nikos@niden.net
+
+          # Absolute, and outside the checkout: a relative ../deploy would land
+          # inside the repository and rsync --delete would be operating in the
+          # checkout.
+          DEPLOY_DIR="${{ runner.temp }}/deploy"
+
+          if git ls-remote --exit-code --heads origin "${DEPLOY_BRANCH}" > /dev/null 2>&1; then
+              git fetch --no-tags --prune --depth=1 \
+                  origin "+refs/heads/${DEPLOY_BRANCH}:refs/remotes/origin/${DEPLOY_BRANCH}"
+              git worktree add "${DEPLOY_DIR}" "origin/${DEPLOY_BRANCH}"
+          else
+              echo "${DEPLOY_BRANCH} does not exist yet; starting it"
+              git worktree add --detach "${DEPLOY_DIR}"
+              git -C "${DEPLOY_DIR}" checkout --orphan "${DEPLOY_BRANCH}"
+              git -C "${DEPLOY_DIR}" rm -rf --quiet . || true
+          fi
+
+          rsync -a --delete --exclude .git dist/ "${DEPLOY_DIR}/"
+          touch "${DEPLOY_DIR}/.nojekyll"
+          git -C "${DEPLOY_DIR}" add -A
+          git -C "${DEPLOY_DIR}" commit -m "Deployed ${GITHUB_SHA::7}" || echo "No changes to deploy"
+          git -C "${DEPLOY_DIR}" push origin "HEAD:${DEPLOY_BRANCH}"

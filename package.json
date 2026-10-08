@@ -1,0 +1,21 @@
+{
+    "name": "phalcon-assets",
+    "type": "module",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "dev": "astro dev",
+        "build": "astro build",
+        "preview": "astro preview",
+        "check": "astro check",
+        "test": "node --test \"tests/*.test.mjs\"",
+        "verify": "node scripts/verify-build.mjs"
+    },
+    "dependencies": {
+        "astro": "^7.3.1"
+    },
+    "devDependencies": {
+        "@astrojs/check": "^0.9.10",
+        "typescript": "^6.0.3"
+    }
+}

@@ -1,0 +1,3 @@
+# The files under public/ are served as they are: git must not change their line
+# ends (a global text=auto would).
+public/** -text

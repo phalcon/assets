@@ -1,10 +1,11 @@
-# Regenerates phalcon/sponsors.json from GitHub Sponsors, Open Collective and
-# the hand-kept partner list, then commits it when it actually changed.
+# Regenerates public/phalcon/sponsors.json from GitHub Sponsors, Open
+# Collective and the hand-kept partner list, then commits it when it actually
+# changed.
 #
-# The commit uses GITHUB_TOKEN, so it deliberately does not trigger other
-# workflows. Cloudflare Pages builds every push to master, so the file is on
-# https://assets.phalcon.io/phalcon/sponsors.json some minutes after the
-# commit. Consumers read it from there.
+# The commit uses GITHUB_TOKEN, so it starts no other workflow by itself. The
+# CI workflow (main.yml) runs when this workflow finishes, and publishes the
+# site, so the file is on https://assets.phalcon.io/phalcon/sponsors.json
+# some minutes after the commit. Consumers read it from there.
 name: Update sponsors
 
 on:
@@ -39,16 +40,16 @@ jobs:
         # broken token fails the run instead of publishing a thinner roster.
         env:
           SPONSORS_TOKEN: ${{ secrets.SPONSORS_TOKEN }}
-        run: php generateSponsors.php
+        run: php scripts/generateSponsors.php
 
       - name: Commit when the roster changed
         run: |
           # Stage first: `git diff` ignores untracked files, so comparing
           # before adding reports "no change" the first time the file is
           # generated, when it is exactly the run that has to commit.
-          git add phalcon/sponsors.json
+          git add public/phalcon/sponsors.json
 
-          if git diff --cached --quiet -- phalcon/sponsors.json; then
+          if git diff --cached --quiet -- public/phalcon/sponsors.json; then
             echo "No change to the roster"
             exit 0
           fi

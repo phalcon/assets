@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ruleset name="Phalcon Assets">
+    <description>PSR-12 for the PHP scripts and their tests.</description>
+    <file>scripts</file>
+    <file>tests</file>
+    <arg name="extensions" value="php"/>
+    <rule ref="PSR12"/>
+</ruleset>

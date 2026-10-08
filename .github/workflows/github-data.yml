@@ -1,12 +1,13 @@
-# Regenerates phalcon/repositories.json (stars and releases) and
-# phalcon/contributors.json for the repositories in _github/repositories.json,
-# then commits them when they changed.
+# Regenerates public/phalcon/repositories.json (stars and releases) and
+# public/phalcon/contributors.json for the repositories in
+# scripts/github/repositories.json, then commits them when they changed.
 #
 # It runs 30 minutes after the sponsors workflow. Both push to master, so this
-# one rebases before it pushes. The commit uses GITHUB_TOKEN, so it does not
-# trigger other workflows. Cloudflare Pages builds every push to master, so
-# the files are on https://assets.phalcon.io/phalcon/ some minutes after the
-# commit. Consumers read them from there.
+# one rebases before it pushes. The commit uses GITHUB_TOKEN, so it starts no
+# other workflow by itself. The CI workflow (main.yml) runs when this workflow
+# finishes, and publishes the site, so the files are on
+# https://assets.phalcon.io/phalcon/ some minutes after the commit. Consumers
+# read them from there.
 name: Update GitHub data
 
 on:
@@ -44,16 +45,16 @@ jobs:
         # API problem fails the run instead of publishing partial data.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: php generateGithub.php
+        run: php scripts/generateGithub.php
 
       - name: Commit when the data changed
         run: |
           # Stage first: `git diff` ignores untracked files, so comparing
           # before adding reports "no change" the first time the files are
           # generated, when it is exactly the run that has to commit.
-          git add phalcon/repositories.json phalcon/contributors.json
+          git add public/phalcon/repositories.json public/phalcon/contributors.json
 
-          if git diff --cached --quiet -- phalcon/repositories.json phalcon/contributors.json; then
+          if git diff --cached --quiet -- public/phalcon/repositories.json public/phalcon/contributors.json; then
             echo "No change to the GitHub data"
             exit 0
           fi
