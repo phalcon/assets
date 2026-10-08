@@ -14,7 +14,7 @@ import {
     sidebarProblems,
     tokensProblems,
     usedTokens,
-} from '../phalcon/tools/design-checks.mjs';
+} from '../public/phalcon/tools/design-checks.mjs';
 
 const css = `/* A comment: --ph-fake: #000000; var(--ph-ghost) */
 :root {
@@ -332,21 +332,21 @@ test('sidebarProblems asks for text parts, and for a label and an https:// addre
 // The files of phalcon/assets: a change here must not stop the refresh of every site.
 
 test('the tokens file of phalcon/assets passes the check of the sites', () => {
-    const tokens = readFileSync(new URL('../phalcon/css/tokens.css', import.meta.url), 'utf8');
+    const tokens = readFileSync(new URL('../public/phalcon/css/tokens.css', import.meta.url), 'utf8');
 
     assert.deepEqual(tokensProblems(tokens, []), []);
 });
 
 test('the code theme of phalcon/assets passes the check of the sites', () => {
-    const json = readFileSync(new URL('../phalcon/css/code-theme.json', import.meta.url), 'utf8');
+    const json = readFileSync(new URL('../public/phalcon/css/code-theme.json', import.meta.url), 'utf8');
     const roles = [...json.matchAll(/var\(--code-([a-z0-9-]+)\)/g)].map((match) => match[1]);
 
     assert.deepEqual(codeThemeProblems(json, roles), []);
 });
 
 test('the common.css of phalcon/assets passes the check of the sites, with the tokens file of phalcon/assets', () => {
-    const file = readFileSync(new URL('../phalcon/css/common.css', import.meta.url), 'utf8');
-    const tokens = readFileSync(new URL('../phalcon/css/tokens.css', import.meta.url), 'utf8');
+    const file = readFileSync(new URL('../public/phalcon/css/common.css', import.meta.url), 'utf8');
+    const tokens = readFileSync(new URL('../public/phalcon/css/tokens.css', import.meta.url), 'utf8');
 
     assert.deepEqual(commonCssProblems(file, tokens), []);
 });
@@ -404,21 +404,21 @@ test('footerProblems asks for at least one social link', () => {
 });
 
 test('the sidebar.css of phalcon/assets passes the check of the sites, with the tokens file of phalcon/assets', () => {
-    const file = readFileSync(new URL('../phalcon/css/sidebar.css', import.meta.url), 'utf8');
-    const tokens = readFileSync(new URL('../phalcon/css/tokens.css', import.meta.url), 'utf8');
+    const file = readFileSync(new URL('../public/phalcon/css/sidebar.css', import.meta.url), 'utf8');
+    const tokens = readFileSync(new URL('../public/phalcon/css/tokens.css', import.meta.url), 'utf8');
 
     assert.deepEqual(sidebarCssProblems(file, tokens), []);
 });
 
 test('the sidebar.json of phalcon/assets passes the check of the sites', () => {
-    const json = readFileSync(new URL('../phalcon/sidebar.json', import.meta.url), 'utf8');
+    const json = readFileSync(new URL('../public/phalcon/sidebar.json', import.meta.url), 'utf8');
 
     assert.deepEqual(sidebarProblems(json), []);
 });
 
 test('the sidebar.css of phalcon/assets sets its text sizes in rem, so that they follow the default size of the reader', () => {
     // A px size stays the same when the reader sets a larger default font size in the browser.
-    const file = readFileSync(new URL('../phalcon/css/sidebar.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    const file = readFileSync(new URL('../public/phalcon/css/sidebar.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
     const px = [...file.matchAll(/(?:font-size|line-height|height)\s*:\s*[^;]*\dpx/g)].map((match) => match[0]);
 
     assert.deepEqual(px, []);
@@ -426,14 +426,14 @@ test('the sidebar.css of phalcon/assets sets its text sizes in rem, so that they
 
 test('the sidebar.css of phalcon/assets lets the projects text wrap a long word', () => {
     // The text comes from sidebar.json; a long word or address must not make the page scroll sideways.
-    const file = readFileSync(new URL('../phalcon/css/sidebar.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    const file = readFileSync(new URL('../public/phalcon/css/sidebar.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
 
     assert.match(file, /\.ph-side__text\s*\{[^}]*overflow-wrap:\s*anywhere;/);
 });
 
 test('the footer.json of phalcon/assets links to the license site, last in the Framework column', () => {
     // phalcon.io has the same link in its own footer data (src/data/site.mjs).
-    const data = JSON.parse(readFileSync(new URL('../phalcon/footer.json', import.meta.url), 'utf8'));
+    const data = JSON.parse(readFileSync(new URL('../public/phalcon/footer.json', import.meta.url), 'utf8'));
     const framework = data.columns.find((column) => column.title === 'Framework');
 
     assert.deepEqual(framework.links.at(-1), { href: 'https://license.phalcon.io', label: 'License' });

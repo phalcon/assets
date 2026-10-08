@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tests for _github/functions.php. Plain PHP, with no framework: each check
+ * Tests for scripts/github/functions.php. Plain PHP, with no framework: each check
  * prints one line, and the exit code is 1 when a check fails.
  *
  * Usage: php tests/github.php
@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../_github/functions.php';
+require __DIR__ . '/../scripts/github/functions.php';
 
 $results = [];
 
@@ -160,7 +160,7 @@ $record = repositoryRecord('phalcon/cphalcon', [
 ]);
 $check(
     'repositoryRecord writes id, url, stars, stable and latest',
-    ['id', 'url', 'stars', 'stable', 'latest'] === array_keys($record)
+    '["id","url","stars","stable","latest"]' === json_encode(array_keys($record))
     && 10812 === $record['stars']
     && '5.22.1' === ($record['stable']['version'] ?? null)
 );

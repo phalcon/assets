@@ -1,0 +1,38 @@
+[
+  {
+    "id": "cloudflare",
+    "name": "Cloudflare",
+    "url": "https://www.cloudflare.com/",
+    "logo": "https://assets.phalcon.io/phalcon/images/backers/cloudflare.svg"
+  },
+  {
+    "id": "digitalocean",
+    "name": "DigitalOcean",
+    "url": "https://www.digitalocean.com/",
+    "logo": "https://assets.phalcon.io/phalcon/images/backers/digitalocean.svg"
+  },
+  {
+    "id": "crowdin",
+    "name": "Crowdin",
+    "url": "https://crowdin.com/",
+    "logo": "https://assets.phalcon.io/phalcon/images/backers/crowdin.png"
+  },
+  {
+    "id": "mctekk",
+    "name": "mctekk",
+    "url": "https://mctekk.com",
+    "logo": "https://assets.phalcon.io/phalcon/images/backers/mctekk-149x34.svg"
+  },
+  {
+    "id": "abits",
+    "name": "Abits",
+    "url": "https://abits.com",
+    "logo": "https://assets.phalcon.io/phalcon/images/backers/abits-100x34.svg"
+  },
+  {
+    "id": "odva",
+    "name": "odva",
+    "url": "https://odva.pro/",
+    "logo": "https://assets.phalcon.io/phalcon/images/backers/odva.svg"
+  }
+]

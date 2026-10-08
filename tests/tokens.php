@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tests for _tokens/functions.php, and the checks of phalcon/css/tokens.css,
+ * Tests for scripts/tokens/functions.php, and the checks of phalcon/css/tokens.css,
  * phalcon/css/code-theme.json, phalcon/css/common.css and
  * phalcon/css/sidebar.css.
  * Plain PHP, with no framework: each check prints one line, and the exit code
@@ -12,8 +12,8 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../_tokens/color-names.php';
-require __DIR__ . '/../_tokens/functions.php';
+require __DIR__ . '/../scripts/tokens/color-names.php';
+require __DIR__ . '/../scripts/tokens/functions.php';
 
 $results = [];
 
@@ -550,7 +550,7 @@ $check(
 );
 
 // phalcon/css/tokens.css
-$file = __DIR__ . '/../phalcon/css/tokens.css';
+$file = __DIR__ . '/../public/phalcon/css/tokens.css';
 $problems = is_file($file) ? tokenProblems((string) file_get_contents($file)) : ['the file is missing'];
 
 foreach ($problems as $problem) {
@@ -561,7 +561,7 @@ $check('phalcon/css/tokens.css has no problems', [] === $problems);
 
 // phalcon/css/code-theme.json: the rules of GitHub's dark theme (Shiki's
 // github-dark-default), with --code- variables.
-$themeFile = __DIR__ . '/../phalcon/css/code-theme.json';
+$themeFile = __DIR__ . '/../public/phalcon/css/code-theme.json';
 $themeJson = is_file($themeFile) ? (string) file_get_contents($themeFile) : '';
 $problems = codeThemeProblems($themeJson, syntaxRoles(is_file($file) ? (string) file_get_contents($file) : ''));
 
@@ -603,7 +603,7 @@ foreach ($wrong as $line) {
 $check("phalcon/css/code-theme.json gives GitHub's roles to the main scopes", [] === $wrong);
 
 // phalcon/css/common.css: the shared header and footer, on the tokens of tokens.css.
-$commonFile = __DIR__ . '/../phalcon/css/common.css';
+$commonFile = __DIR__ . '/../public/phalcon/css/common.css';
 $tokenRules = parseRules(is_file($file) ? (string) file_get_contents($file) : '')['rules'];
 $defined = [] === $tokenRules ? [] : array_column(parseDeclarations($tokenRules[0]['body']), 'name');
 $problems = is_file($commonFile)
@@ -617,7 +617,7 @@ foreach ($problems as $problem) {
 $check('phalcon/css/common.css has no problems', [] === $problems);
 
 // phalcon/css/sidebar.css: the shared sidebar, on the tokens of tokens.css.
-$sidebarFile = __DIR__ . '/../phalcon/css/sidebar.css';
+$sidebarFile = __DIR__ . '/../public/phalcon/css/sidebar.css';
 $problems = is_file($sidebarFile)
     ? sidebarCssProblems((string) file_get_contents($sidebarFile), $defined)
     : ['the file is missing'];

@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { after, before, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { fromArgument, refresh } from '../phalcon/tools/design-refresh.mjs';
+import { fromArgument, refresh } from '../public/phalcon/tools/design-refresh.mjs';
 
 // A folder in the checkout, not in the temporary folder of the system. The tests remove it at the end.
 const work = mkdtempSync(join(fileURLToPath(new URL('..', import.meta.url)), '.refresh-test-'));
