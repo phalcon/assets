@@ -3,7 +3,7 @@
         {
             "id": "phalcon/cphalcon",
             "url": "https://github.com/phalcon/cphalcon",
-            "stars": 10820,
+            "stars": 10819,
             "stable": {
                 "tag": "v5.22.1",
                 "version": "5.22.1",
@@ -29,14 +29,14 @@
         {
             "id": "phalcon/documentation",
             "url": "https://github.com/phalcon/documentation",
-            "stars": 22,
+            "stars": 23,
             "stable": null,
             "latest": null
         },
         {
             "id": "zephir-lang/zephir",
             "url": "https://github.com/zephir-lang/zephir",
-            "stars": 3384,
+            "stars": 3383,
             "stable": {
                 "tag": "1.6.1",
                 "version": "1.6.1",
@@ -95,7 +95,7 @@
         {
             "id": "phalcon/phalcon-devtools",
             "url": "https://github.com/phalcon/phalcon-devtools",
-            "stars": 1324,
+            "stars": 1323,
             "stable": {
                 "tag": "v4.2.0",
                 "version": "4.2.0",
@@ -110,7 +110,7 @@
         {
             "id": "phalcon/quill",
             "url": "https://github.com/phalcon/quill",
-            "stars": 1,
+            "stars": 2,
             "stable": {
                 "tag": "v0.5.0",
                 "version": "0.5.0",
