@@ -70,15 +70,9 @@ body {
 /* ------------------------------------------------------------------- nav */
 
 /*
- * The site's part of the shared nav (common.css). .nav-end holds the links of
- * common.css, the theme switcher and the burger, so that the switcher stays
- * next to the burger below 64rem.
+ * The site's part of the shared nav (common.css): the theme switcher, in
+ * .ph-nav__end of common.css, between the Discord icon and the burger.
  */
-.nav-end {
-    align-items: center;
-    display: flex;
-    gap: 1.5rem;
-}
 
 /* The theme switcher. The moon and the sun are white, on the dark nav. common.css resets the buttons of the nav, so this rule sets the cursor. */
 .switcher button {
