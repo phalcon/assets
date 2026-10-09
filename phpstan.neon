@@ -6,5 +6,6 @@ parameters:
         - scripts
         - tests
     typeAliases:
+        BackerEntry: 'array{name: string, url: string|null, logo: string|null, group: string}'
         SponsorRecord: 'array{id: string, name: string, url: string|null, logo: string|null, kind: string, source: list<string>, monthlyUsd: int}'
         RosterEntry: 'array{id: string, name: string, url: string|null, logo: string|null, group: string, kind: string, source: list<string>}'

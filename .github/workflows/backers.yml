@@ -1,0 +1,75 @@
+# Rebuilds the roster in a file of the calling repository (README.md by
+# default) from https://assets.phalcon.io/phalcon/sponsors.json, then commits
+# the file when it changed. The file must have the <!-- backers:start --> and
+# <!-- backers:end --> markers. The script changes only the text between them.
+#
+# A repository calls this workflow on a schedule, after the roster job of this
+# repository (04:17 UTC). README.md shows a caller.
+#
+# The script comes from the commit of this workflow file, so a caller that
+# pins a SHA runs the script of that SHA. The commit uses the GITHUB_TOKEN of
+# the calling repository, so it does not start other workflows there.
+name: Update backers
+
+on:
+  workflow_call:
+    inputs:
+      file:
+        description: The file with the roster markers, from the root of the repository.
+        type: string
+        default: README.md
+
+permissions:
+  contents: write
+
+jobs:
+  backers:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: backers
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: repository
+
+      - name: Checkout the script
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: assets
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: 8.4
+
+      - name: Rebuild the roster
+        # The script exits non-zero when the download fails, the roster is
+        # not correct, or the markers are missing. The run then fails and the
+        # file does not change.
+        env:
+          BACKERS_FILE: ${{ inputs.file }}
+        run: php assets/scripts/updateBackers.php "repository/${BACKERS_FILE}"
+
+      - name: Commit when the roster changed
+        working-directory: repository
+        env:
+          BACKERS_FILE: ${{ inputs.file }}
+        run: |
+          git add -- "${BACKERS_FILE}"
+
+          if git diff --cached --quiet -- "${BACKERS_FILE}"; then
+            echo "No change to ${BACKERS_FILE}"
+            exit 0
+          fi
+
+          git config user.name niden
+          git config user.email nikos@niden.net
+          git commit -m "Updating the backers roster"
+          git push

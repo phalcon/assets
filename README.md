@@ -14,8 +14,8 @@ The site is built with [Astro](https://astro.build). The CI workflow (`.github/w
 - `public/phalcon/css/`: the shared stylesheets of the sites: `tokens.css` (the design tokens), `common.css` (the shared nav and footer), `sidebar.css` (the shared sidebar) and `code-theme.json` (the code theme).
 - `public/phalcon/footer.json` and `public/phalcon/sidebar.json`: the links of the shared footer, and the titles and text of the shared sidebar.
 - `public/phalcon/tools/`: the shared tools that each site gets before every build: `design-checks.mjs` and `design-refresh.mjs` (the checks and the refresh of the design files) and `stars.mjs` (the star count of the nav).
-- `scripts/`: the generators of the data (`generateSponsors.php`, `generateGithub.php`, with `sponsors/` and `github/`), the PHP checks of the shared files (`tokens/`), and the checks of the build (`verify-build.mjs`).
-- `tests/`: the PHP tests (`tokens.php`, `github.php`, `sponsors.php`) and the Node tests.
+- `scripts/`: the generators of the data (`generateSponsors.php`, `generateGithub.php`, with `sponsors/` and `github/`), the roster script of the other repositories (`updateBackers.php`, with `backers/`), the PHP checks of the shared files (`tokens/`), and the checks of the build (`verify-build.mjs`).
+- `tests/`: the PHP tests (`tokens.php`, `github.php`, `sponsors.php`, `backers.php`) and the Node tests.
 - `src/`: the page of the site (the shared nav, footer and sidebar).
 
 #### The data workflows
@@ -25,13 +25,41 @@ The site is built with [Astro](https://astro.build). The CI workflow (`.github/w
 
 Each commits when its data changed. The CI workflow runs after each of them, so the new data is live some minutes later.
 
+#### The backers workflow
+
+`backers.yml` is a reusable workflow. It runs `php scripts/updateBackers.php` on a file of the repository that calls it (`README.md` by default), and commits the file when the roster changed. The script replaces the text between `<!-- backers:start -->` and `<!-- backers:end -->` with the roster of `https://assets.phalcon.io/phalcon/sponsors.json`.
+
+A repository calls it every day, one hour after the roster job:
+
+```yaml
+name: Update backers
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backers:
+    uses: phalcon/assets/.github/workflows/backers.yml@<commit SHA> # master
+    # Only when the file is not README.md:
+    with:
+      file: BACKERS.md
+```
+
+The workflow runs the script of the commit that the caller pins. When the script changes, change the SHA in each caller.
+
 #### Local use
 
 The tools run in Docker:
 
 - Install: `docker run --rm -v "$PWD:/app" -w /app node:22-alpine npm ci`
 - Tests: `docker run --rm -v "$PWD:/app" -w /app node:22-alpine npm test`
-- PHP tests: `docker run --rm -v "$PWD:/app" -w /app php:8.4-cli sh -c 'php tests/tokens.php && php tests/github.php && php tests/sponsors.php'`
+- PHP tests: `docker run --rm -v "$PWD:/app" -w /app php:8.4-cli sh -c 'php tests/tokens.php && php tests/github.php && php tests/sponsors.php && php tests/backers.php'`
 - PHP analyzers: `phpcs` (PSR-12, `phpcs.xml`) and `phpstan analyse` (level max, `phpstan.neon`).
 - Build and checks: `docker run --rm -v "$PWD:/app" -w /app node:22-alpine sh -c 'npm run build && npm run verify'`
 - Preview: `docker run --rm -p 4321:4321 -v "$PWD:/app" -w /app node:22-alpine npx astro preview --host 0.0.0.0`

@@ -75,6 +75,9 @@ jobs:
       - name: Check the rules of the sponsors roster
         run: php tests/sponsors.php
 
+      - name: Check the rules of the backers roster
+        run: php tests/backers.php
+
       - name: Install dependencies
         run: npm ci
 
