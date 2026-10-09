@@ -27,7 +27,7 @@ Each commits when its data changed. The CI workflow runs after each of them, so 
 
 #### The backers workflow
 
-`backers.yml` is a reusable workflow. It runs `php scripts/updateBackers.php` on a file of the repository that calls it (`README.md` by default), and commits the file when the roster changed. The script replaces the text between `<!-- backers:start -->` and `<!-- backers:end -->` with the roster of `https://assets.phalcon.io/phalcon/sponsors.json`.
+`backers.yml` is a reusable workflow. It runs `php scripts/updateBackers.php` on a file of the repository that calls it (`README.md` by default). The script replaces the text between `<!-- backers:start -->` and `<!-- backers:end -->` with the roster of `https://assets.phalcon.io/phalcon/sponsors.json`. When the file changed, the workflow pushes the change to the branch `backers-roster-update` and opens a pull request `Updating the backers roster`. There is at most one open pull request: a new change replaces the change of an earlier run, and when the roster is the same as on the base branch again, the workflow closes the pull request. The repository must allow GitHub Actions to create pull requests (Settings, Actions, General).
 
 A repository calls it every day, one hour after the roster job:
 
@@ -42,6 +42,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   backers:

@@ -1,14 +1,16 @@
 # Rebuilds the roster in a file of the calling repository (README.md by
-# default) from https://assets.phalcon.io/phalcon/sponsors.json, then commits
-# the file when it changed. The file must have the <!-- backers:start --> and
-# <!-- backers:end --> markers. The script changes only the text between them.
+# default) from https://assets.phalcon.io/phalcon/sponsors.json. When the file
+# changed, it opens a pull request to the branch of the run. The file must
+# have the <!-- backers:start --> and <!-- backers:end --> markers. The script
+# changes only the text between them.
 #
 # A repository calls this workflow on a schedule, after the roster job of this
 # repository (04:17 UTC). README.md shows a caller.
 #
 # The script comes from the commit of this workflow file, so a caller that
-# pins a SHA runs the script of that SHA. The commit uses the GITHUB_TOKEN of
-# the calling repository, so it does not start other workflows there.
+# pins a SHA runs the script of that SHA. The push and the pull request use
+# the GITHUB_TOKEN of the calling repository, so they do not start other
+# workflows there.
 name: Update backers
 
 on:
@@ -21,6 +23,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   backers:
@@ -57,19 +60,49 @@ jobs:
           BACKERS_FILE: ${{ inputs.file }}
         run: php assets/scripts/updateBackers.php "repository/${BACKERS_FILE}"
 
-      - name: Commit when the roster changed
+      - name: Open a pull request when the roster changed
+        # The branch of the run is protected, so the change goes to one
+        # branch and one pull request. A new change replaces the change of an
+        # earlier run, so the open pull request always has the newest roster.
         working-directory: repository
         env:
           BACKERS_FILE: ${{ inputs.file }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          BRANCH: backers-roster-update
+          GH_TOKEN: ${{ github.token }}
         run: |
           git add -- "${BACKERS_FILE}"
 
+          open=$(gh pr list --head "${BRANCH}" --base "${BASE_BRANCH}" --state open --json number --jq 'length')
+
           if git diff --cached --quiet -- "${BACKERS_FILE}"; then
             echo "No change to ${BACKERS_FILE}"
+
+            # The roster is the same as on the base branch again, so the open
+            # pull request of an earlier run is out of date.
+            if [ "${open}" != "0" ]; then
+              gh pr close "${BRANCH}" --delete-branch --comment "The roster is the same as on ${BASE_BRANCH} again."
+            fi
+
+            exit 0
+          fi
+
+          # The open pull request already has this roster, so push nothing.
+          if [ "${open}" != "0" ] \
+            && git fetch --depth=1 origin "${BRANCH}" \
+            && git diff --cached --quiet FETCH_HEAD -- "${BACKERS_FILE}"; then
+            echo "The open pull request already has this roster"
             exit 0
           fi
 
           git config user.name niden
           git config user.email nikos@niden.net
+          git switch -C "${BRANCH}"
           git commit -m "Updating the backers roster"
-          git push
+          git push --force origin "${BRANCH}"
+
+          if [ "${open}" = "0" ]; then
+            gh pr create --base "${BASE_BRANCH}" --head "${BRANCH}" \
+              --title "Updating the backers roster" \
+              --body "The backers workflow rebuilt the roster from https://assets.phalcon.io/phalcon/sponsors.json."
+          fi
