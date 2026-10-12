@@ -10,7 +10,9 @@
  */
 import { readFileSync } from 'node:fs';
 
-import { DATA_WORKFLOWS, FEEDS, ISSUE_TITLE, feedProblems, issueAction } from './watch/checks.mjs';
+import {
+    DATA_WORKFLOWS, FEEDS, ISSUE_TITLE, feedNotes, feedProblems, issueAction, newestRun,
+} from './watch/checks.mjs';
 
 const dryRun = process.argv.includes('--dry-run');
 const repo = process.env.GITHUB_REPOSITORY ?? 'phalcon/assets';
@@ -29,6 +31,11 @@ async function api(path, options = {}) {
             ...(token === '' ? {} : { authorization: `Bearer ${token}` }),
             ...(options.body === undefined ? {} : { 'content-type': 'application/json' }),
         },
+    }).catch((error) => {
+        // fetch() gives only "fetch failed": the cause has the code (for example ENOTFOUND).
+        const cause = error.cause?.code ?? error.message;
+
+        throw new Error(`the GitHub API did not answer ${options.method ?? 'GET'} ${path}: ${cause}`);
     });
 
     if (!response.ok) {
@@ -38,15 +45,14 @@ async function api(path, options = {}) {
     return response.json();
 }
 
-/** The last run of a workflow, with a query (event=schedule, branch=master), or null. */
+/** The last run of a workflow, with a query (event=schedule, branch=master), or null (see newestRun). */
 async function lastRun(workflow, query) {
-    const { workflow_runs: runs } = await api(`/actions/workflows/${workflow}/runs?${query}&per_page=1`);
+    const { workflow_runs: runs } = await api(`/actions/workflows/${workflow}/runs?${query}&per_page=10`);
+    const run = newestRun(runs);
 
-    if (runs.length === 0) {
+    if (run === null) {
         return null;
     }
-
-    const [run] = runs;
 
     return { conclusion: run.conclusion, createdAt: run.created_at, status: run.status, url: run.html_url };
 }
@@ -86,6 +92,7 @@ try {
     const number = action.number === undefined ? '' : ` #${action.number}`;
 
     console.log(problems.length === 0 ? 'problems: none' : problems.map((problem) => `problem: ${problem}`).join('\n'));
+    feedNotes({ ciRun }).forEach((note) => console.log(`note: ${note}`));
     console.log(`issue: ${action.action}${number}${dryRun ? ' (dry run)' : ''}`);
 
     if (!dryRun && action.action === 'create') {

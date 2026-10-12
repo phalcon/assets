@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { test } from 'node:test';
 
-import { feedProblems, ISSUE_TITLE, issueAction } from '../scripts/watch/checks.mjs';
+import { feedNotes, feedProblems, ISSUE_TITLE, issueAction, newestRun } from '../scripts/watch/checks.mjs';
 
 const NOW = Date.parse('2026-10-09T05:47:00Z');
 const RUN = 'https://github.com/phalcon/assets/actions/runs/1';
@@ -97,6 +97,20 @@ test('feedProblems reports a live feed that does not answer 200, or does not ans
     ]);
 });
 
+test('feedNotes says that the watch did not compare the live feeds while the CI deploys', () => {
+    const ciRun = run({ conclusion: null, createdAt: '2026-10-09T05:46:00Z', status: 'in_progress' });
+
+    assert.deepEqual(feedNotes({ ciRun }), [
+        'main.yml: the run on master (2026-10-09T05:46:00Z) is in_progress, so the watch did not compare the live feeds '
+            + `with the files of master: ${RUN}`,
+    ]);
+});
+
+test('feedNotes has no note when the last CI run on master is complete, or when there is no run', () => {
+    assert.deepEqual(feedNotes({ ciRun: run() }), []);
+    assert.deepEqual(feedNotes({ ciRun: null }), []);
+});
+
 test('issueAction opens an issue for new problems', () => {
     assert.deepEqual(issueAction({ date: '2026-10-09', openIssue: null, problems: ['a', 'b'], runUrl: WATCH }), {
         action: 'create',
@@ -124,4 +138,15 @@ test('issueAction closes the open issue when every check passes again', () => {
 
 test('issueAction does nothing on a good day with no open issue', () => {
     assert.deepEqual(issueAction({ date: '2026-10-09', openIssue: null, problems: [], runUrl: WATCH }), { action: 'none' });
+});
+
+test('newestRun skips the run of a pull request from a fork branch named master', () => {
+    const push = { event: 'push', id: 2 };
+
+    assert.equal(newestRun([{ event: 'pull_request', id: 3 }, push, { event: 'push', id: 1 }]), push);
+});
+
+test('newestRun gives null when every run is a pull request run, or when there is no run', () => {
+    assert.equal(newestRun([{ event: 'pull_request', id: 3 }]), null);
+    assert.equal(newestRun([]), null);
 });

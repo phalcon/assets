@@ -17,6 +17,23 @@ export const ISSUE_TITLE = 'The assets feeds need attention';
 export const MAX_AGE_HOURS = 26;
 
 /**
+ * The notes of the watch, as text: the checks that it did not do. An empty list when it did all the checks.
+ *
+ * @param {object} data
+ * @param {object|null} data.ciRun The last run of main.yml on master.
+ * @returns {string[]}
+ */
+export function feedNotes({ ciRun }) {
+    if (!deploying(ciRun)) {
+        return [];
+    }
+
+    const skipped = 'so the watch did not compare the live feeds with the files of master';
+
+    return [`main.yml: the run on master (${ciRun.createdAt}) is ${ciRun.status}, ${skipped}: ${ciRun.url}`];
+}
+
+/**
  * The problems of the feeds, as text: an empty list when every check passes.
  *
  * A run is `{ conclusion, createdAt, status, url }` (the GitHub API fields `conclusion`, `created_at`, `status`,
@@ -55,15 +72,12 @@ export function feedProblems({ ciRun, dataRuns, files, now }) {
         problems.push(`main.yml: the last run on master (${ciRun.createdAt}) is ${ciRun.conclusion}: ${ciRun.url}`);
     }
 
-    // While the CI runs, a deploy is on its way: a live feed can be older than master for some minutes.
-    const deploying = ciRun !== null && ciRun.status !== 'completed';
-
     for (const { live, master, name, status } of files) {
         if (status === 0) {
             problems.push(`phalcon/${name}: the live address does not answer`);
         } else if (status !== 200) {
             problems.push(`phalcon/${name}: the live address answers ${status}`);
-        } else if (live !== master && !deploying) {
+        } else if (live !== master && !deploying(ciRun)) {
             problems.push(`phalcon/${name}: the live file is not the file of master`);
         }
     }
@@ -108,4 +122,21 @@ export function issueAction({ date, openIssue, problems, runUrl }) {
     }
 
     return { action: 'none' };
+}
+
+/**
+ * The newest run of a list (the GitHub API `workflow_runs`, newest first) that is not a pull request run, or null.
+ * A pull request from a fork branch named master has the head branch master too, so the query branch=master also
+ * gives its runs: they are not runs on master.
+ *
+ * @param {{ event: string }[]} runs
+ * @returns {object|null}
+ */
+export function newestRun(runs) {
+    return runs.find((run) => run.event !== 'pull_request') ?? null;
+}
+
+/** While the CI on master runs, a deploy is on its way: a live feed can be older than master for some minutes. */
+function deploying(ciRun) {
+    return ciRun !== null && ciRun.status !== 'completed';
 }
