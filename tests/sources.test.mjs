@@ -257,3 +257,17 @@ test('the social card address has a version, so that platforms fetch a new card'
     // A platform (Discord, X, LinkedIn) keeps a preview image by its address. Change the version when the card changes.
     assert.match(read('src/site.ts'), /\n {4}image: 'https:\/\/assets\.phalcon\.io\/phalcon\/social\/github\.phalcon\.assets\.png\?v=2',\n/);
 });
+
+test('the feed watch runs every day after the data workflows, with only the permissions that it needs', () => {
+    // Open Item 10 of the sites roadmap: a GitHub issue when the feeds of assets.phalcon.io are not current.
+    const workflow = read('.github/workflows/watch.yml');
+
+    assert.match(workflow, /\non:\n {2}schedule:\n(?: {4}#.*\n)* {4}- cron: "47 5 \* \* \*"\n\n {2}workflow_dispatch:\n/);
+    assert.match(workflow, /\npermissions:\n {2}actions: read\n {2}contents: read\n {2}issues: write\n\n/);
+    assert.match(workflow, /\n {8}env:\n {10}GITHUB_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\}\n {8}run: node scripts\/watch-feeds\.mjs\n/);
+    // The same pinned actions as the other workflows.
+    assert.deepEqual(workflow.match(/uses: [^\n]+/g), [
+        'uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1',
+        'uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0',
+    ]);
+});

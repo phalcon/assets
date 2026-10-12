@@ -14,7 +14,7 @@ The site is built with [Astro](https://astro.build). The CI workflow (`.github/w
 - `public/phalcon/css/`: the shared stylesheets of the sites: `tokens.css` (the design tokens), `common.css` (the shared nav and footer), `sidebar.css` (the shared sidebar) and `code-theme.json` (the code theme).
 - `public/phalcon/footer.json` and `public/phalcon/sidebar.json`: the links of the shared footer, and the titles and text of the shared sidebar.
 - `public/phalcon/tools/`: the shared tools that each site gets before every build: `design-checks.mjs` and `design-refresh.mjs` (the checks and the refresh of the design files) and `stars.mjs` (the star count of the nav).
-- `scripts/`: the generators of the data (`generateSponsors.php`, `generateGithub.php`, with `sponsors/` and `github/`), the roster script of the other repositories (`updateBackers.php`, with `backers/`), the PHP checks of the shared files (`tokens/`), and the checks of the build (`verify-build.mjs`).
+- `scripts/`: the generators of the data (`generateSponsors.php`, `generateGithub.php`, with `sponsors/` and `github/`), the roster script of the other repositories (`updateBackers.php`, with `backers/`), the PHP checks of the shared files (`tokens/`), the feed watch (`watch-feeds.mjs`, with `watch/`), and the checks of the build (`verify-build.mjs`).
 - `tests/`: the PHP tests (`tokens.php`, `github.php`, `sponsors.php`, `backers.php`) and the Node tests.
 - `src/`: the page of the site (the shared nav, footer and sidebar).
 
@@ -24,6 +24,8 @@ The site is built with [Astro](https://astro.build). The CI workflow (`.github/w
 - `github-data.yml` (daily): `php scripts/generateGithub.php` writes `public/phalcon/repositories.json` and `public/phalcon/contributors.json` for the repositories of `scripts/github/repositories.json`.
 
 Each commits when its data changed. The CI workflow runs after each of them, so the new data is live some minutes later.
+
+`watch.yml` (daily, 05:47 UTC) checks that the feeds are current: the last scheduled runs of the two data workflows passed and are less than 26 hours old, the last CI run on `master` passed, and the live feeds are the files of `master`. When a check fails, it opens the issue "The assets feeds need attention" (or adds a comment to the open one) and the run fails. When every check passes again, it closes the issue. The checks are in `scripts/watch/checks.mjs`. To see the state now, with the files of `master` in the working tree: `docker run --rm -v "$PWD:/app" -w /app node:22-alpine node scripts/watch-feeds.mjs --dry-run`.
 
 #### The backers workflow
 

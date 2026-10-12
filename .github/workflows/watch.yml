@@ -1,0 +1,47 @@
+# Checks every day that the feeds of assets.phalcon.io are current: the last
+# scheduled runs of sponsors.yml and github-data.yml passed and are less than
+# 26 hours old, the last CI run on master passed, and the live
+# phalcon/sponsors.json, phalcon/repositories.json and
+# phalcon/contributors.json are the files of master.
+#
+# When a check fails, the watch opens a GitHub issue ("The assets feeds need
+# attention"), or adds a comment to the open one, and the run fails. When every
+# check passes again, it closes the issue. The checks are in
+# scripts/watch/checks.mjs (Open Item 10 of the sites roadmap).
+name: Watch the feeds
+
+on:
+  schedule:
+    # Daily, after the data workflows (04:17, 04:47) and their deploys, and
+    # before phalcon.io reads the feeds (06:17).
+    - cron: "47 5 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+concurrency:
+  group: watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Watch the feeds
+        # The script uses only Node: no npm ci.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/watch-feeds.mjs
