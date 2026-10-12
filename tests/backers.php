@@ -76,6 +76,16 @@ $check(
         . '" title="' . $escaped . '" width="60" height="60"></a>'
         === backerHtml($entry('backer', 'https://logo.test/a.png?u=1&v=4', 'https://a.test/?a=1&b=2', 'A & <B> "C"'))
 );
+$check(
+    'backerHtml puts a name with line breaks on one line',
+    '<img src="https://logo.test/a.png" alt="A **B** C" title="A **B** C" width="60" height="60">'
+        === backerHtml($entry('backer', $logo, null, " A\n\n**B**  C\n"))
+);
+$check(
+    'backerHtml shows HTML, Markdown and web addresses in the name of an entry with no logo as text',
+    'A &#38; &#60;B&#62; &#91;x&#93;&#40;https&#58;&#47;&#47;e&#46;test&#41; www&#46;e&#46;test'
+        === backerHtml($entry('backer', null, null, 'A & <B> [x](https://e.test) www.e.test'))
+);
 
 // backersMarkdown
 $check(
@@ -124,6 +134,16 @@ $check(
     'backerEntries rejects a sponsor with no name',
     $throws(static fn () => backerEntries('{"sponsors":[{"group":"backer"}]}'), RuntimeException::class)
 );
+$check(
+    'backerEntries rejects a sponsor with an empty name',
+    $throws(static fn () => backerEntries('{"sponsors":[{"name":" ","group":"backer"}]}'), RuntimeException::class)
+);
+$check(
+    'backerEntries gives no address and no logo for empty values',
+    [['name' => 'Alpha', 'url' => null, 'logo' => null, 'group' => 'backer']] === backerEntries(
+        '{"sponsors":[{"name":"Alpha","url":"","logo":" ","group":"backer"}]}'
+    )
+);
 
 $committed = (string) file_get_contents(__DIR__ . '/../public/phalcon/sponsors.json');
 $decoded   = json_decode($committed, true);
@@ -160,6 +180,14 @@ $check(
         static fn () => replaceRoster(BACKERS_END . "\n" . BACKERS_START . "\n", $roster),
         RuntimeException::class
     )
+);
+$check(
+    'replaceRoster rejects a file with two start markers',
+    $throws(static fn () => replaceRoster(BACKERS_START . "\n" . $file, $roster), RuntimeException::class)
+);
+$check(
+    'replaceRoster rejects a file with two end markers',
+    $throws(static fn () => replaceRoster($file . BACKERS_END . "\n", $roster), RuntimeException::class)
 );
 
 $failed = 0;

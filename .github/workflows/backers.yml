@@ -73,7 +73,11 @@ jobs:
         run: |
           git add -- "${BACKERS_FILE}"
 
-          open=$(gh pr list --head "${BRANCH}" --base "${BASE_BRANCH}" --state open --json number --jq 'length')
+          # A pull request from a fork can have the same branch name, so only a
+          # pull request of this repository counts. The value is its number, or
+          # 0 when there is no open pull request.
+          open=$(gh pr list --head "${BRANCH}" --base "${BASE_BRANCH}" --state open \
+            --json number,isCrossRepository --jq 'map(select(.isCrossRepository | not)) | .[0].number // 0')
 
           if git diff --cached --quiet -- "${BACKERS_FILE}"; then
             echo "No change to ${BACKERS_FILE}"
@@ -81,7 +85,7 @@ jobs:
             # The roster is the same as on the base branch again, so the open
             # pull request of an earlier run is out of date.
             if [ "${open}" != "0" ]; then
-              gh pr close "${BRANCH}" --delete-branch --comment "The roster is the same as on ${BASE_BRANCH} again."
+              gh pr close "${open}" --delete-branch --comment "The roster is the same as on ${BASE_BRANCH} again."
             fi
 
             exit 0

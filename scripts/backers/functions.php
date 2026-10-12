@@ -32,7 +32,8 @@ const BACKERS_START = '<!-- backers:start -->';
 /**
  * The entries of the text of sponsors.json, in their order. Throws when the
  * text is not a JSON object, when the roster has no sponsors, or when a
- * sponsor has no name or no group.
+ * sponsor has no name or no group. An empty name, address or logo is the
+ * same as no value.
  *
  * @return list<BackerEntry>
  */
@@ -47,7 +48,7 @@ function backerEntries(string $json): array
     $entries = [];
 
     foreach (nodesAt($data, 'sponsors') as $node) {
-        $name  = stringAt($node, 'name');
+        $name  = backerText($node, 'name');
         $group = stringAt($node, 'group');
 
         if (null === $name || null === $group) {
@@ -56,8 +57,8 @@ function backerEntries(string $json): array
 
         $entries[] = [
             'name'  => $name,
-            'url'   => stringAt($node, 'url'),
-            'logo'  => stringAt($node, 'logo'),
+            'url'   => backerText($node, 'url'),
+            'logo'  => backerText($node, 'logo'),
             'group' => $group,
         ];
     }
@@ -72,13 +73,15 @@ function backerEntries(string $json): array
 /**
  * The HTML of an entry: the logo or the avatar, with a link to the address.
  * An entry with no logo shows its name. An entry with no address has no link.
+ * The name is on one line, so a blank line in it cannot end the HTML.
  *
  * @param BackerEntry $entry
  */
 function backerHtml(array $entry): string
 {
-    $name = htmlspecialchars($entry['name']);
-    $html = $name;
+    $text = (string) preg_replace('/\s+/u', ' ', trim($entry['name']));
+    $name = htmlspecialchars($text);
+    $html = backerName($text);
 
     if (null !== $entry['logo']) {
         $html = sprintf(
@@ -95,6 +98,19 @@ function backerHtml(array $entry): string
     }
 
     return sprintf('<a href="%s">%s</a>', htmlspecialchars($entry['url']), $html);
+}
+
+/**
+ * The name for a text position. Each ASCII punctuation character is a numeric
+ * entity, so GitHub finds no HTML, no Markdown and no web address in it.
+ */
+function backerName(string $name): string
+{
+    return (string) preg_replace_callback(
+        '/[[:punct:]]/',
+        static fn (array $match): string => '&#' . ord($match[0]) . ';',
+        $name,
+    );
 }
 
 /**
@@ -132,18 +148,38 @@ function backersMarkdown(array $entries): string
 }
 
 /**
+ * The string at $key of a roster entry, or null when the value is not a
+ * string or has only white space.
+ *
+ * @param array<mixed> $node
+ */
+function backerText(array $node, string $key): ?string
+{
+    $value = stringAt($node, $key);
+
+    return null === $value || '' === trim($value) ? null : $value;
+}
+
+/**
  * The text of the file with the roster between the markers. The text outside
- * the markers does not change. Throws when a marker is missing, or when the
- * end marker is before the start marker.
+ * the markers does not change. Throws when a marker is missing, when a marker
+ * is in the file more than one time, or when the end marker is before the
+ * start marker.
  */
 function replaceRoster(string $contents, string $roster): string
 {
     $start = strpos($contents, BACKERS_START);
     $end   = strpos($contents, BACKERS_END);
 
-    if (false === $start || false === $end || $end < $start) {
+    if (
+        false === $start
+        || false === $end
+        || $end < $start
+        || 1 !== substr_count($contents, BACKERS_START)
+        || 1 !== substr_count($contents, BACKERS_END)
+    ) {
         throw new RuntimeException(
-            sprintf('the file has no %s and %s markers in this order', BACKERS_START, BACKERS_END),
+            sprintf('the file must have one %s and one %s marker, in this order', BACKERS_START, BACKERS_END),
         );
     }
 
