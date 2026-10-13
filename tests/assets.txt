@@ -835,7 +835,6 @@ phalcon/favicons/mstile-310x150.png
 phalcon/favicons/mstile-310x310.png
 phalcon/favicons/mstile-70x70.png
 phalcon/favicons/safari-pinned-tab.svg
-phalcon/footer-fragment.html
 phalcon/footer.json
 phalcon/images/404.jpg
 phalcon/images/ajax-loader.gif
@@ -1187,9 +1186,6 @@ phalcon/images/svg/phalcon-logo-300x300.svg
 phalcon/images/svg/phalcon-logo-35x39.svg
 phalcon/images/svg/phalcon-logo-transparent-black.svg
 phalcon/images/svg/phalcon-logo-white-105x40.svg
-phalcon/js/core.js
-phalcon/js/core.min.js
-phalcon/js/main.min.js
 phalcon/js/theme.js
 phalcon/js/theme.min.js
 phalcon/mockup/phalcon-alternative-green.png
@@ -1239,7 +1235,6 @@ phalcon/social/github.phalcon.vokuro.png
 phalcon/social/github.phalcon.volt.png
 phalcon/social/github.png
 phalcon/social/twitter.png
-phalcon/sponsors-fragment.html
 phalcon/sponsors.json
 phalcon/tools/design-checks.mjs
 phalcon/tools/design-refresh.mjs
