@@ -136,6 +136,18 @@ export function newestRun(runs) {
     return runs.find((run) => run.event !== 'pull_request') ?? null;
 }
 
+/**
+ * The open issue of the watch in a list (the GitHub API open issues, which has the pull requests too), or null.
+ *
+ * @param {{ number: number, pull_request?: object, title: string }[]} issues
+ * @returns {{ number: number }|null}
+ */
+export function watchIssue(issues) {
+    const issue = issues.find(({ pull_request: pull, title }) => title === ISSUE_TITLE && pull === undefined);
+
+    return issue === undefined ? null : { number: issue.number };
+}
+
 /** While the CI on master runs, a deploy is on its way: a live feed can be older than master for some minutes. */
 function deploying(ciRun) {
     return ciRun !== null && ciRun.status !== 'completed';

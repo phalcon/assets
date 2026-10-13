@@ -38,6 +38,9 @@ jobs:
         # live feeds with the files of master as they are now.
         with:
           ref: master
+          # No later step uses git: the token of the run does not stay in
+          # .git/config.
+          persist-credentials: false
 
       - name: Set up Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0

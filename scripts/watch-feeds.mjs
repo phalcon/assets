@@ -11,7 +11,7 @@
 import { readFileSync } from 'node:fs';
 
 import {
-    DATA_WORKFLOWS, FEEDS, ISSUE_TITLE, feedNotes, feedProblems, issueAction, newestRun,
+    DATA_WORKFLOWS, FEEDS, feedNotes, feedProblems, issueAction, newestRun, watchIssue,
 } from './watch/checks.mjs';
 
 const dryRun = process.argv.includes('--dry-run');
@@ -57,13 +57,20 @@ async function lastRun(workflow, query) {
     return { conclusion: run.conclusion, createdAt: run.created_at, status: run.status, url: run.html_url };
 }
 
-/** A live feed: the HTTP status (0 when the address does not answer) and the text. */
-async function liveFeed(name) {
+/** A live feed: the HTTP status (0 when the address does not answer, also on the second try) and the text. */
+async function liveFeed(name, tries = 2) {
     try {
         const response = await fetch(`https://assets.phalcon.io/phalcon/${name}`);
 
         return { live: await response.text(), status: response.status };
     } catch {
+        if (tries > 1) {
+            // One short network failure is not a problem: try again after 10 seconds.
+            await new Promise((resolve) => { setTimeout(resolve, 10_000); });
+
+            return liveFeed(name, tries - 1);
+        }
+
         return { live: '', status: 0 };
     }
 }
@@ -80,11 +87,11 @@ try {
         master: readFileSync(new URL(`../public/phalcon/${name}`, import.meta.url), 'utf8'),
     })));
     const problems = feedProblems({ ciRun, dataRuns, files, now });
-    const issues = await api('/issues?state=open&per_page=100');
-    const open = issues.find((issue) => issue.title === ISSUE_TITLE && issue.pull_request === undefined);
+    // Only the issues that the GITHUB_TOKEN of the watch opened, so the first page has the open issue of the watch.
+    const issues = await api('/issues?state=open&creator=github-actions%5Bbot%5D&per_page=100');
     const action = issueAction({
         date: new Date(now).toISOString().slice(0, 10),
-        openIssue: open === undefined ? null : { number: open.number },
+        openIssue: watchIssue(issues),
         problems,
         runUrl,
     });

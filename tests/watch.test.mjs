@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { test } from 'node:test';
 
-import { feedNotes, feedProblems, ISSUE_TITLE, issueAction, newestRun } from '../scripts/watch/checks.mjs';
+import { feedNotes, feedProblems, ISSUE_TITLE, issueAction, newestRun, watchIssue } from '../scripts/watch/checks.mjs';
 
 const NOW = Date.parse('2026-10-09T05:47:00Z');
 const RUN = 'https://github.com/phalcon/assets/actions/runs/1';
@@ -149,4 +149,19 @@ test('newestRun skips the run of a pull request from a fork branch named master'
 test('newestRun gives null when every run is a pull request run, or when there is no run', () => {
     assert.equal(newestRun([{ event: 'pull_request', id: 3 }]), null);
     assert.equal(newestRun([]), null);
+});
+
+test('watchIssue finds the open issue of the watch, not a pull request or an issue with another title', () => {
+    const issues = [
+        { number: 9, pull_request: {}, title: ISSUE_TITLE },
+        { number: 8, title: 'Another issue' },
+        { number: 7, title: ISSUE_TITLE },
+    ];
+
+    assert.deepEqual(watchIssue(issues), { number: 7 });
+});
+
+test('watchIssue gives null when no open issue has the title of the watch', () => {
+    assert.equal(watchIssue([{ number: 9, pull_request: {}, title: ISSUE_TITLE }]), null);
+    assert.equal(watchIssue([]), null);
 });

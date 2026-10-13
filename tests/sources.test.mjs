@@ -267,6 +267,8 @@ test('the feed watch runs every day after the data workflows, with only the perm
     assert.match(workflow, /\n {8}env:\n {10}GITHUB_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\}\n {8}run: node scripts\/watch-feeds\.mjs\n/);
     // A re-run uses the commit of its first run: the checkout must give the files of master as they are now.
     assert.match(workflow, /uses: actions\/checkout@[^\n]+\n(?: {8}#.*\n)* {8}with:\n {10}ref: master\n/);
+    // No later step uses git: the token of the run must not stay in .git/config.
+    assert.match(workflow, /\n {10}ref: master\n(?: {10}#.*\n)* {10}persist-credentials: false\n/);
     // The same pinned actions as the other workflows.
     assert.deepEqual(workflow.match(/uses: [^\n]+/g), [
         'uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1',
