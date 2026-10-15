@@ -275,3 +275,13 @@ test('the feed watch runs every day after the data workflows, with only the perm
         'uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0',
     ]);
 });
+
+test('Built with Phalcon links to the page on phalcon.io', () => {
+    // The page replaces builtwith.phalcon.io (2026-10-14). The footer is the source that the other sites copy.
+    for (const file of ['src/components/Header.astro', 'public/phalcon/footer.json']) {
+        const source = read(file);
+
+        assert.match(source, /["']Built with Phalcon["'], ["']?href["']?: ["']https:\/\/phalcon\.io\/built-with["']/, file);
+        assert.doesNotMatch(source, /builtwith\.phalcon\.io/, file);
+    }
+});
