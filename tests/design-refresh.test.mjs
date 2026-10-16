@@ -124,6 +124,28 @@ test('refresh checks each file alone', async () => {
     assert.equal(readFileSync(good, 'utf8'), 'new text');
 });
 
+test('refresh keeps the copy and warns when a check throws, and checks the next file', async () => {
+    // An icon without binary: true comes as text, and icoProblems throws on text.
+    const broken = copyOf('throws.css', 'old text');
+    const good = copyOf('after-throws.css', 'old text');
+    const { log, out } = lines();
+    const results = await refresh({
+        files: [
+            { copy: broken, name: 'good.css', problems: (text) => text.readUInt16LE(0) },
+            { copy: good, name: 'good.css', problems: noProblem },
+        ],
+        log,
+        source,
+    });
+
+    assert.deepEqual(results, [
+        { copy: broken, problems: ['the check failed: text.readUInt16LE is not a function'], result: 'kept' },
+        { copy: good, problems: [], result: 'changed' },
+    ]);
+    assert.equal(readFileSync(broken, 'utf8'), 'old text');
+    assert.equal(out[0], '::warning title=Design tokens::good.css: the check failed: text.readUInt16LE is not a function');
+});
+
 test('refresh reads the files from a folder when from is given', async () => {
     copyOf('local.css', 'local text');
 
@@ -177,6 +199,16 @@ test('refresh leaves a binary copy that has the same bytes', async () => {
     const results = await refresh({ files: [{ binary: true, copy, name: 'icon.bin', problems: noProblem }], log, source });
 
     assert.deepEqual(results, [{ copy, problems: [], result: 'same' }]);
+});
+
+test('refresh replaces a binary copy that is different only in bytes that are not UTF-8', async () => {
+    // fe ff and ff fe are both two U+FFFD as text: a text compare would find them the same and keep the old icon.
+    const copy = copyOf('swapped.bin', Buffer.from([0x89, 0x00, 0xfe, 0xff, 0x0a]));
+    const { log } = lines();
+    const results = await refresh({ files: [{ binary: true, copy, name: 'icon.bin', problems: noProblem }], log, source });
+
+    assert.deepEqual(results, [{ copy, problems: [], result: 'changed' }]);
+    assert.ok(readFileSync(copy).equals(served['/css/icon.bin']));
 });
 
 test('refresh reads a binary file from a folder when from is given', async () => {

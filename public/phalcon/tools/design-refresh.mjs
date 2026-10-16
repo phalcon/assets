@@ -8,9 +8,9 @@
  * A site lists its files in scripts/update-tokens.mjs: the name of the file,
  * the committed copy, and the check that a new file must pass (see
  * design-checks.mjs). An image (an icon) has `binary: true`: the tool reads,
- * compares and writes its bytes as they are. A file that cannot be read, or
- * that has a problem, keeps its committed copy and prints a GitHub Actions
- * warning. Each file is checked alone. Nothing is committed: the committed
+ * compares and writes its bytes as they are. A file that cannot be read, that
+ * has a problem, or whose check fails with an error, keeps its committed copy
+ * and prints a GitHub Actions warning. Each file is checked alone. Nothing is committed: the committed
  * copies are the default.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -70,7 +70,7 @@ export async function refresh({ files, from = null, log = console.log, source })
 
     for (const { binary = false, copy, name, problems: check } of files) {
         const loaded = await load(name, from, source, binary);
-        const problems = 'problem' in loaded ? [loaded.problem] : check(loaded.content);
+        const problems = 'problem' in loaded ? [loaded.problem] : checked(check, loaded.content);
         /** @type {'changed' | 'kept' | 'missing' | 'same'} */
         let result = 'kept';
 
@@ -90,6 +90,22 @@ export async function refresh({ files, from = null, log = console.log, source })
     }
 
     return results;
+}
+
+/**
+ * The problems that the check finds in the new file. An error of the check is
+ * a problem too, so that one wrong entry does not stop the other files.
+ *
+ * @param {(content: any) => string[]} check
+ * @param {string | Buffer} content
+ * @returns {string[]}
+ */
+function checked(check, content) {
+    try {
+        return check(content);
+    } catch (error) {
+        return [`the check failed: ${error instanceof Error ? error.message : String(error)}`];
+    }
 }
 
 /**

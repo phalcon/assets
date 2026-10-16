@@ -396,7 +396,9 @@ export function sidebarProblems(json) {
  * The problems of an SVG icon for a site: a whole SVG image (one <svg>
  * element, after an optional XML declaration), not an HTML page, and with no
  * script. The site serves its copy from its own origin, so a script in the
- * file would run there. An empty list means that the file can replace the
+ * file would run there. The check stops a mistake (an editor that adds a
+ * script), not an attack: a person who can change the icon on assets can also
+ * change this file. An empty list means that the file can replace the
  * committed copy.
  *
  * @param {Buffer} bytes
@@ -410,7 +412,11 @@ export function svgProblems(bytes) {
         return ['the file is not an SVG image'];
     }
 
-    return /<script[\s>]|\son[a-z]+\s*=/i.test(text) ? ['the file has a script'] : [];
+    // A script element (also with a prefix, as svg:script), an event attribute, a javascript: URL, or a foreignObject
+    // (it can hold HTML).
+    const script = /<(?:[\w-]+:)?script[\s>]|\son[a-z]+\s*=|javascript:|<(?:[\w-]+:)?foreignObject[\s>]/i;
+
+    return script.test(text) ? ['the file has a script'] : [];
 }
 
 /**

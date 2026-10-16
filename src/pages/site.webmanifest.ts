@@ -1,8 +1,10 @@
 /*
  * The web app manifest of the site: its name, and the icons of
- * public/phalcon/favicons/ for a home screen. A home screen icon opens the
- * site in the browser (display: browser): it is a web site, not an app. The
- * colors come from the design tokens, as in Meta.astro.
+ * public/phalcon/favicons/ for a home screen. The short name is the site part
+ * only, so that a home screen does not cut it: the icon shows the brand. A
+ * home screen icon opens the site in the browser (display: browser): it is a
+ * web site, not an app. The colors come from the design tokens, as in
+ * Meta.astro.
  */
 import type { APIRoute } from 'astro';
 
@@ -14,7 +16,7 @@ export const GET: APIRoute = () => {
     const color = resolveToken(tokens, '--ph-dark-bg');
     const manifest = {
         name: site.name,
-        short_name: site.name,
+        short_name: 'Assets',
         description: site.description,
         start_url: '/',
         display: 'browser',

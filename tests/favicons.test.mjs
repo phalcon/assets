@@ -1,6 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { inflateSync } from 'node:zlib';
 
 import { icoProblems, pngProblems, resolveToken, svgProblems } from '../public/phalcon/tools/design-checks.mjs';
 
@@ -23,6 +24,26 @@ const contrast = (first, second) => {
     const [light, dark] = [luminance(first), luminance(second)].sort((a, b) => b - a);
 
     return (light + 0.05) / (dark + 0.05);
+};
+
+/** The first pixel of a PNG with 8 bits for each sample (RGB or RGBA): its #rrggbb color, and its alpha. */
+const firstPixel = (png) => {
+    const data = [];
+
+    for (let at = 8; at < png.length; at += 12 + png.readUInt32BE(at)) {
+        if (png.toString('latin1', at + 4, at + 8) === 'IDAT') {
+            data.push(png.subarray(at + 8, at + 8 + png.readUInt32BE(at)));
+        }
+    }
+
+    // Each row starts with a filter byte. For the first pixel of the first row, every filter adds 0, so the bytes
+    // after it are the samples.
+    const row = inflateSync(Buffer.concat(data));
+
+    assert.equal(png[24], 8, 'bits for each sample');
+    assert.ok([2, 6].includes(png[25]), 'RGB or RGBA');
+
+    return { alpha: png[25] === 6 ? row[4] : 255, color: `#${row.subarray(1, 4).toString('hex')}` };
 };
 
 test('favicon.svg has one style rule: in a dark browser, the dark gray paths take --ph-dark-muted', () => {
@@ -54,6 +75,11 @@ test('browserconfig.xml has the tile color of --ph-dark-bg, as the theme-color o
     const color = /<TileColor>([^<]*)<\/TileColor>/.exec(bytes('browserconfig.xml').toString('utf8'))?.[1];
 
     assert.equal(color, resolveToken(tokens, '--ph-dark-bg'));
+});
+
+test('apple-touch-icon.png is not transparent: its corner has the color of --ph-light-bg', () => {
+    // iOS fills a transparent area of a home screen icon with black, and the dark gray wing disappears there.
+    assert.deepEqual(firstPixel(bytes('apple-touch-icon.png')), { alpha: 255, color: resolveToken(tokens, '--ph-light-bg') });
 });
 
 test('the icons that the sites copy pass the icon checks', () => {

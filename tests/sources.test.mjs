@@ -4,7 +4,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 import { missingTokens } from '../public/phalcon/tools/design-checks.mjs';
-import { sourceFiles, usedBySite } from '../scripts/token-sources.mjs';
+import { sourceFiles, tokensIn, usedBySite } from '../scripts/token-sources.mjs';
 
 const root = new URL('../', import.meta.url);
 const read = (file) => readFileSync(new URL(file, root), 'utf8');
@@ -39,10 +39,10 @@ test('the tokens file defines every token that the site uses', () => {
 });
 
 test('the source scan counts a token that a component reads by name', () => {
-    // Meta.astro and site.webmanifest.ts give --ph-dark-bg to resolveToken(), for the browser bar.
-    const used = usedBySite();
-
-    assert.ok(used.has('--ph-dark-bg'), '--ph-dark-bg');
+    // Meta.astro and site.webmanifest.ts give --ph-dark-bg to resolveToken(), for the browser bar. site.css also uses
+    // --ph-dark-bg in var(), so a text with a token only in quotes shows that the scan counts a name.
+    assert.deepEqual([...tokensIn("resolveToken(tokens, '--ph-only-named'); color: var(--ph-in-var);")].sort(), ['--ph-in-var', '--ph-only-named']);
+    assert.ok(usedBySite().has('--ph-dark-bg'), '--ph-dark-bg');
 });
 
 test('the page uses the shared files of this repository, not copies of them', () => {

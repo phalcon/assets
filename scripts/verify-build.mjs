@@ -154,8 +154,10 @@ count(
  * The icons, the same set as on the other sites. Every page links the ICO,
  * the SVG and the apple-touch icon of public/phalcon/favicons/ and the
  * manifest, and no tag of the old set. The manifest has the name of the site,
- * the color of the browser bar, and the two icons of a home screen, which are
- * in dist/. Some clients ask for /favicon.ico: it goes to the ICO.
+ * a short name of the site part only (the icon shows the brand), the
+ * description of the pages, the color of the browser bar, and the two icons of
+ * a home screen, which are in dist/. A home screen icon opens the home page in
+ * the browser. Some clients ask for /favicon.ico: it goes to the ICO.
  */
 const ICON_TAGS = [
     '<link rel="icon" href="/phalcon/favicons/favicon.ico" sizes="32x32">',
@@ -175,6 +177,13 @@ count(
 );
 count('pages with a tag of the Windows tiles', measure(() => pages.filter((file) => /name="msapplication-/.test(html(file))).length), 0);
 count('manifest name', measure(() => manifest.name), 'Phalcon Assets');
+count('manifest short name', measure(() => manifest.short_name), 'Assets');
+count(
+    'manifest description',
+    measure(() => manifest.description),
+    measure(() => /<meta name="description" content="([^"]*)"/.exec(html('dist/index.html'))?.[1] ?? 'none')
+);
+count('manifest display and start URL', measure(() => `${manifest.display} ${manifest.start_url}`), 'browser /');
 count('manifest colors', measure(() => `${manifest.background_color} ${manifest.theme_color}`), `${darkBg} ${darkBg}`);
 count('manifest icon sizes', measure(() => manifest.icons.map((icon) => icon.sizes).join(' ')), '192x192 512x512');
 count(

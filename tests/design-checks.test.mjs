@@ -542,7 +542,13 @@ test('svgProblems finds a file that is not an SVG image', () => {
 
 test('svgProblems finds a script', () => {
     // The site serves its copy from its own origin: a script in the file runs there when the file opens.
-    for (const text of [svg.replace('</svg>', '<script>alert(1)</script></svg>'), svg.replace('<path', '<path onload="alert(1)"')]) {
+    for (const text of [
+        svg.replace('</svg>', '<script>alert(1)</script></svg>'),
+        svg.replace('<path', '<path onload="alert(1)"'),
+        svg.replace('</svg>', '<svg:script xmlns:svg="http://www.w3.org/2000/svg">alert(1)</svg:script></svg>'),
+        svg.replace('</svg>', '<a href="javascript:alert(1)"><path d="M0 0h1v1z"/></a></svg>'),
+        svg.replace('</svg>', '<foreignObject><iframe srcdoc="&lt;script&gt;alert(1)&lt;/script&gt;"></iframe></foreignObject></svg>'),
+    ]) {
         assert.deepEqual(svgProblems(Buffer.from(text)), ['the file has a script']);
     }
 });
