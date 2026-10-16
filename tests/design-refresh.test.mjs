@@ -9,7 +9,7 @@ import { fromArgument, refresh } from '../public/phalcon/tools/design-refresh.mj
 
 // A folder in the checkout, not in the temporary folder of the system. The tests remove it at the end.
 const work = mkdtempSync(join(fileURLToPath(new URL('..', import.meta.url)), '.refresh-test-'));
-const served = { '/css/bad.css': 'bad text', '/css/good.css': 'new text' };
+const served = { '/css/bad.css': 'bad text', '/css/good.css': 'new text', '/css/icon.bin': Buffer.from([0x89, 0x00, 0xff, 0xfe, 0x0a]) };
 const noProblem = () => [];
 let server;
 let source;
@@ -153,6 +153,41 @@ test('refresh reports a missing copy when the new file has a problem and there i
     assert.deepEqual(results, [{ copy, problems: ['a problem'], result: 'missing' }]);
     assert.ok(!existsSync(copy));
     assert.deepEqual(out, ['::warning title=Design tokens::good.css: a problem', `missing       ${copy}`]);
+});
+
+test('refresh replaces a binary copy with the bytes of the new file, and gives the check a Buffer', async () => {
+    // 0xff and 0xfe are not UTF-8: a text read would change them.
+    const copy = copyOf('changed.bin', 'old bytes');
+    const seen = [];
+    const { log } = lines();
+    const results = await refresh({
+        files: [{ binary: true, copy, name: 'icon.bin', problems: (bytes) => (seen.push(bytes), []) }],
+        log,
+        source,
+    });
+
+    assert.deepEqual(results, [{ copy, problems: [], result: 'changed' }]);
+    assert.ok(readFileSync(copy).equals(served['/css/icon.bin']));
+    assert.ok(Buffer.isBuffer(seen[0]) && seen[0].equals(served['/css/icon.bin']));
+});
+
+test('refresh leaves a binary copy that has the same bytes', async () => {
+    const copy = copyOf('same.bin', served['/css/icon.bin']);
+    const { log } = lines();
+    const results = await refresh({ files: [{ binary: true, copy, name: 'icon.bin', problems: noProblem }], log, source });
+
+    assert.deepEqual(results, [{ copy, problems: [], result: 'same' }]);
+});
+
+test('refresh reads a binary file from a folder when from is given', async () => {
+    copyOf('local.bin', served['/css/icon.bin']);
+
+    const copy = copyOf('from.bin', 'old bytes');
+    const { log } = lines();
+    const results = await refresh({ files: [{ binary: true, copy, name: 'local.bin', problems: noProblem }], from: work, log, source });
+
+    assert.deepEqual(results, [{ copy, problems: [], result: 'changed' }]);
+    assert.ok(readFileSync(copy).equals(served['/css/icon.bin']));
 });
 
 test('fromArgument gives the folder after --from, or null', () => {

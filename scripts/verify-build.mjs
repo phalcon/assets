@@ -151,6 +151,44 @@ count(
 );
 
 /*
+ * The icons, the same set as on the other sites. Every page links the ICO,
+ * the SVG and the apple-touch icon of public/phalcon/favicons/ and the
+ * manifest, and no tag of the old set. The manifest has the name of the site,
+ * the color of the browser bar, and the two icons of a home screen, which are
+ * in dist/. Some clients ask for /favicon.ico: it goes to the ICO.
+ */
+const ICON_TAGS = [
+    '<link rel="icon" href="/phalcon/favicons/favicon.ico" sizes="32x32">',
+    '<link rel="icon" href="/phalcon/favicons/favicon.svg" type="image/svg+xml">',
+    '<link rel="apple-touch-icon" href="/phalcon/favicons/apple-touch-icon.png">',
+    '<link rel="manifest" href="/site.webmanifest">',
+].join(' ');
+const manifest = measure(() => JSON.parse(html('dist/site.webmanifest')));
+const darkBg = resolveToken(readFileSync('public/phalcon/css/tokens.css', 'utf8'), '--ph-dark-bg');
+
+count(
+    'pages without exactly the icon tags',
+    measure(() => pages.filter((file) => [...html(file).matchAll(/<link[^>]*rel="(?:apple-touch-icon|icon|manifest|mask-icon|shortcut icon)"[^>]*>/g)]
+        .map((match) => match[0])
+        .join(' ') !== ICON_TAGS).length),
+    0
+);
+count('pages with a tag of the Windows tiles', measure(() => pages.filter((file) => /name="msapplication-/.test(html(file))).length), 0);
+count('manifest name', measure(() => manifest.name), 'Phalcon Assets');
+count('manifest colors', measure(() => `${manifest.background_color} ${manifest.theme_color}`), `${darkBg} ${darkBg}`);
+count('manifest icon sizes', measure(() => manifest.icons.map((icon) => icon.sizes).join(' ')), '192x192 512x512');
+count(
+    'manifest icons that are not in dist',
+    measure(() => manifest.icons.filter((icon) => !existsSync(`dist${icon.src}`)).map((icon) => icon.src).join(', ') || 'none'),
+    'none'
+);
+count(
+    'redirect of /favicon.ico',
+    measure(() => html('dist/_redirects').split('\n').filter((line) => line.startsWith('/favicon.ico ')).join(' | ') || 'none'),
+    '/favicon.ico /phalcon/favicons/favicon.ico 301'
+);
+
+/*
  * The shared nav and footer (common.css, the classes of phalcon.io). Every
  * page has them, with the theme switcher and the mobile menu script, and
  * nothing of the Jekyll site: its stylesheet and scripts, or a file from

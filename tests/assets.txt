@@ -822,6 +822,8 @@ phalcon/css/common.css
 phalcon/css/sidebar.css
 phalcon/css/tokens.css
 phalcon/fanart-fragment.html
+phalcon/favicons/android-chrome-192x192.png
+phalcon/favicons/android-chrome-512x512.png
 phalcon/favicons/apple-touch-icon.png
 phalcon/favicons/browserconfig.xml
 phalcon/favicons/favicon-16x16.png

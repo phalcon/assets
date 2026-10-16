@@ -8,10 +8,13 @@ import {
     definedCodeRoles,
     definedTokens,
     footerProblems,
+    icoProblems,
     missingTokens,
+    pngProblems,
     resolveToken,
     sidebarCssProblems,
     sidebarProblems,
+    svgProblems,
     tokensProblems,
     usedTokens,
 } from '../public/phalcon/tools/design-checks.mjs';
@@ -36,6 +39,44 @@ const theme = (changes = {}) => JSON.stringify({
     type: 'dark',
     ...changes,
 });
+
+/** A PNG image: the signature, the start of the IHDR chunk of a width x height image (8 bits), and the IEND chunk. */
+const png = (width, height) => {
+    const header = Buffer.alloc(25);
+
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(header, 0);
+    header.writeUInt32BE(13, 8);
+    header.write('IHDR', 12, 'latin1');
+    header.writeUInt32BE(width, 16);
+    header.writeUInt32BE(height, 20);
+    header[24] = 8;
+
+    return Buffer.concat([header, Buffer.from([0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82])]);
+};
+
+/** An ICO image with an entry for each size, each image 4 bytes of zero after the list. */
+const ico = (...sizes) => {
+    const list = Buffer.alloc(6 + 16 * sizes.length);
+
+    list.writeUInt16LE(1, 2);
+    list.writeUInt16LE(sizes.length, 4);
+    sizes.forEach((size, index) => {
+        const at = 6 + 16 * index;
+
+        list[at] = size === 256 ? 0 : size;
+        list[at + 1] = size === 256 ? 0 : size;
+        list.writeUInt32LE(4, at + 8);
+        list.writeUInt32LE(list.length + 4 * index, at + 12);
+    });
+
+    return Buffer.concat([list, Buffer.alloc(4 * sizes.length)]);
+};
+
+/** A small SVG image. */
+const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><path d="M0 0h1v1z" fill="#3A3A3A"/></svg>';
+
+/** The page that a server can send in place of a file. */
+const htmlPage = Buffer.from('<!doctype html><html><head><title>Not found</title></head><body></body></html>');
 
 // The tokens
 
@@ -437,4 +478,71 @@ test('the footer.json of phalcon/assets links to the license site, last in the F
     const framework = data.columns.find((column) => column.title === 'Framework');
 
     assert.deepEqual(framework.links.at(-1), { href: 'https://license.phalcon.io', label: 'License' });
+});
+
+// The icons
+
+test('icoProblems accepts an ICO image with a 32x32 image', () => {
+    assert.deepEqual(icoProblems(ico(16, 32, 48)), []);
+    assert.deepEqual(icoProblems(ico(32)), []);
+});
+
+test('icoProblems finds a file that is not an ICO image', () => {
+    for (const bytes of [Buffer.alloc(0), htmlPage, png(32, 32), ico().subarray(0, 4), ico()]) {
+        assert.deepEqual(icoProblems(bytes), ['the file is not an ICO image']);
+    }
+});
+
+test('icoProblems finds a file that is cut', () => {
+    const whole = ico(16, 32);
+
+    // The list of images is cut, then the last image.
+    assert.deepEqual(icoProblems(whole.subarray(0, 20)), ['the file is not whole']);
+    assert.deepEqual(icoProblems(whole.subarray(0, whole.length - 1)), ['the file is not whole']);
+});
+
+test('icoProblems finds an ICO image with no 32x32 image', () => {
+    assert.deepEqual(icoProblems(ico(16, 48, 256)), ['the file has no 32x32 image']);
+});
+
+test('pngProblems accepts a PNG image of the size', () => {
+    assert.deepEqual(pngProblems(png(180, 180), 180), []);
+    assert.deepEqual(pngProblems(png(512, 512), 512), []);
+});
+
+test('pngProblems finds a file that is not a PNG image', () => {
+    for (const bytes of [Buffer.alloc(0), htmlPage, ico(32), png(32, 32).subarray(0, 20)]) {
+        assert.deepEqual(pngProblems(bytes, 32), ['the file is not a PNG image']);
+    }
+});
+
+test('pngProblems finds a file that is cut', () => {
+    const whole = png(32, 32);
+
+    // The file stops before the IEND chunk, then in it.
+    assert.deepEqual(pngProblems(whole.subarray(0, 25), 32), ['the file is not whole']);
+    assert.deepEqual(pngProblems(whole.subarray(0, whole.length - 1), 32), ['the file is not whole']);
+});
+
+test('pngProblems finds an image of another size', () => {
+    assert.deepEqual(pngProblems(png(180, 180), 192), ['the image is 180x180, not 192x192']);
+    assert.deepEqual(pngProblems(png(192, 180), 192), ['the image is 192x180, not 192x192']);
+});
+
+test('svgProblems accepts a whole SVG image, also after an XML declaration', () => {
+    assert.deepEqual(svgProblems(Buffer.from(svg)), []);
+    assert.deepEqual(svgProblems(Buffer.from(`<?xml version="1.0" encoding="utf-8"?>\n${svg}\n`)), []);
+});
+
+test('svgProblems finds a file that is not an SVG image', () => {
+    for (const bytes of [Buffer.alloc(0), htmlPage, Buffer.from(svg.slice(0, -6)), Buffer.from(`<html>${svg}</html>`)]) {
+        assert.deepEqual(svgProblems(bytes), ['the file is not an SVG image']);
+    }
+});
+
+test('svgProblems finds a script', () => {
+    // The site serves its copy from its own origin: a script in the file runs there when the file opens.
+    for (const text of [svg.replace('</svg>', '<script>alert(1)</script></svg>'), svg.replace('<path', '<path onload="alert(1)"')]) {
+        assert.deepEqual(svgProblems(Buffer.from(text)), ['the file has a script']);
+    }
 });

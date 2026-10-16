@@ -39,11 +39,9 @@ test('the tokens file defines every token that the site uses', () => {
 });
 
 test('the source scan counts a token that a component reads by name', () => {
-    // Meta.astro gives --ph-brand-400 and --ph-dark-bg to resolveToken(), for the browser colors. No stylesheet uses
-    // --ph-brand-400, so it shows that the scan counts a name in quotes.
+    // Meta.astro and site.webmanifest.ts give --ph-dark-bg to resolveToken(), for the browser bar.
     const used = usedBySite();
 
-    assert.ok(used.has('--ph-brand-400'), '--ph-brand-400');
     assert.ok(used.has('--ph-dark-bg'), '--ph-dark-bg');
 });
 
@@ -182,7 +180,9 @@ test('.gitattributes keeps the bytes of the files under public/', () => {
 
 test('no file under public/ has a name that starts with a dot or an underscore', () => {
     // Jekyll did not serve such files; Astro serves every file of public/. They were deleted, so no address changed.
+    // _redirects is the list of redirects that Cloudflare Pages reads at the root of the build.
     const hidden = readdirSync(new URL('public/', root), { recursive: true })
+        .filter((path) => path !== '_redirects')
         .filter((path) => path.split('/').some((part) => /^[._]/.test(part)));
 
     assert.deepEqual(hidden, []);
