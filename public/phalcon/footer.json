@@ -48,5 +48,5 @@
         { "label": "LinkedIn", "href": "https://phalcon.io/linkedin" },
         { "label": "Reddit", "href": "https://phalcon.io/reddit" }
     ],
-    "copyright": "Phalcon Team · cphalcon (v5) BSD-3-Clause · phalcon (v6) MIT"
+    "copyright": "Phalcon Team · BSD-3-Clause"
 }
