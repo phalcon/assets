@@ -3,7 +3,7 @@
         {
             "id": "phalcon/cphalcon",
             "url": "https://github.com/phalcon/cphalcon",
-            "stars": 10822,
+            "stars": 10821,
             "stable": {
                 "tag": "v5.23.0",
                 "version": "5.23.0",
@@ -51,7 +51,7 @@
         {
             "id": "phalcon/vokuro",
             "url": "https://github.com/phalcon/vokuro",
-            "stars": 366,
+            "stars": 365,
             "stable": {
                 "tag": "v5.0.4",
                 "version": "5.0.4",
@@ -95,7 +95,7 @@
         {
             "id": "phalcon/phalcon-devtools",
             "url": "https://github.com/phalcon/phalcon-devtools",
-            "stars": 1323,
+            "stars": 1322,
             "stable": {
                 "tag": "v4.2.0",
                 "version": "4.2.0",
@@ -132,7 +132,7 @@
         {
             "id": "phalcon/invo",
             "url": "https://github.com/phalcon/invo",
-            "stars": 346,
+            "stars": 345,
             "stable": {
                 "tag": "v5.0.2",
                 "version": "5.0.2",
