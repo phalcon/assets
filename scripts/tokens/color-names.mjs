@@ -7,7 +7,7 @@
  * packages go to .color-names/, and the command removes that folder at the end:
  *
  *   docker run --rm -v "$PWD:/app" -w /app --user "$(id -u):$(id -g)" \
- *     -e HOME=/app/.color-names -e npm_config_cache=/app/.color-names/cache node:22-alpine \
+ *     -e HOME=/app/.color-names -e npm_config_cache=/app/.color-names/cache node:26-alpine \
  *     sh -c 'npm install --prefix .color-names --no-audit --no-fund color-name@2 mdn-data@2 > /dev/null \
  *       && node scripts/tokens/color-names.mjs .color-names/node_modules; rm -rf .color-names'
  */

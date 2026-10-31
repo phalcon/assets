@@ -25,7 +25,7 @@ The site is built with [Astro](https://astro.build). The CI workflow (`.github/w
 
 Each commits when its data changed. The CI workflow runs after each of them, so the new data is live some minutes later.
 
-`watch.yml` (daily, 05:47 UTC) checks that the feeds are current: the last scheduled runs of the two data workflows passed and are less than 26 hours old, the last CI run on `master` passed, and the live feeds are the files of `master`. When a check fails, it opens the issue "The assets feeds need attention" (or adds a comment to the open one) and the run fails. When every check passes again, it closes the issue. A failed scheduled run of a data workflow stays a problem until a re-run of that run passes: a manual run of the workflow does not clear it, because the watch reads only the scheduled runs. The checks are in `scripts/watch/checks.mjs`. To see the state now, with the files of `master` in the working tree (after `git pull`): `docker run --rm -v "$PWD:/app" -w /app node:22-alpine node scripts/watch-feeds.mjs --dry-run`.
+`watch.yml` (daily, 05:47 UTC) checks that the feeds are current: the last scheduled runs of the two data workflows passed and are less than 26 hours old, the last CI run on `master` passed, and the live feeds are the files of `master`. When a check fails, it opens the issue "The assets feeds need attention" (or adds a comment to the open one) and the run fails. When every check passes again, it closes the issue. A failed scheduled run of a data workflow stays a problem until a re-run of that run passes: a manual run of the workflow does not clear it, because the watch reads only the scheduled runs. The checks are in `scripts/watch/checks.mjs`. To see the state now, with the files of `master` in the working tree (after `git pull`): `docker run --rm -v "$PWD:/app" -w /app node:26-alpine node scripts/watch-feeds.mjs --dry-run`.
 
 #### The backers workflow
 
@@ -60,12 +60,12 @@ The workflow runs the script of the commit that the caller pins. When the script
 
 The tools run in Docker:
 
-- Install: `docker run --rm -v "$PWD:/app" -w /app node:22-alpine npm ci`
-- Tests: `docker run --rm -v "$PWD:/app" -w /app node:22-alpine npm test`
+- Install: `docker run --rm -v "$PWD:/app" -w /app node:26-alpine npm ci`
+- Tests: `docker run --rm -v "$PWD:/app" -w /app node:26-alpine npm test`
 - PHP tests: `docker run --rm -v "$PWD:/app" -w /app php:8.4-cli sh -c 'php tests/tokens.php && php tests/github.php && php tests/sponsors.php && php tests/backers.php'`
 - PHP analyzers: `phpcs` (PSR-12, `phpcs.xml`) and `phpstan analyse` (level max, `phpstan.neon`).
-- Build and checks: `docker run --rm -v "$PWD:/app" -w /app node:22-alpine sh -c 'npm run build && npm run verify'`
-- Preview: `docker run --rm -p 4321:4321 -v "$PWD:/app" -w /app node:22-alpine npx astro preview --host 0.0.0.0`
+- Build and checks: `docker run --rm -v "$PWD:/app" -w /app node:26-alpine sh -c 'npm run build && npm run verify'`
+- Preview: `docker run --rm -p 4321:4321 -v "$PWD:/app" -w /app node:26-alpine npx astro preview --host 0.0.0.0`
 
 #### Colors, fonts, the nav and the footer
 
