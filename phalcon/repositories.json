@@ -36,16 +36,16 @@
         {
             "id": "zephir-lang/zephir",
             "url": "https://github.com/zephir-lang/zephir",
-            "stars": 3381,
+            "stars": 3380,
             "stable": {
-                "tag": "1.6.1",
-                "version": "1.6.1",
-                "date": "2026-10-02"
+                "tag": "1.7.0",
+                "version": "1.7.0",
+                "date": "2026-10-30"
             },
             "latest": {
-                "tag": "1.6.1",
-                "version": "1.6.1",
-                "date": "2026-10-02"
+                "tag": "1.7.0",
+                "version": "1.7.0",
+                "date": "2026-10-30"
             }
         },
         {
