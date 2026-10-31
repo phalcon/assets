@@ -269,11 +269,16 @@ test('the feed watch runs every day after the data workflows, with only the perm
     assert.match(workflow, /uses: actions\/checkout@[^\n]+\n(?: {8}#.*\n)* {8}with:\n {10}ref: master\n/);
     // No later step uses git: the token of the run must not stay in .git/config.
     assert.match(workflow, /\n {10}ref: master\n(?: {10}#.*\n)* {10}persist-credentials: false\n/);
-    // The same pinned actions as the other workflows.
-    assert.deepEqual(workflow.match(/uses: [^\n]+/g), [
-        'uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1',
-        'uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0',
-    ]);
+    // The same pinned actions as the other workflows. Compare with main.yml, not with fixed SHAs, so that an
+    // update of the pins does not break this test.
+    const pins = workflow.match(/uses: [^\n]+/g);
+    const main = read('.github/workflows/main.yml');
+
+    assert.deepEqual(pins.map((pin) => pin.replace(/@.*/, '')), ['uses: actions/checkout', 'uses: actions/setup-node']);
+
+    for (const pin of pins) {
+        assert.ok(main.includes(pin), pin);
+    }
 });
 
 test('Built with Phalcon links to the page on phalcon.io', () => {
