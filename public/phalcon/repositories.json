@@ -36,7 +36,7 @@
         {
             "id": "zephir-lang/zephir",
             "url": "https://github.com/zephir-lang/zephir",
-            "stars": 3380,
+            "stars": 3379,
             "stable": {
                 "tag": "1.7.0",
                 "version": "1.7.0",
