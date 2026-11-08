@@ -69,7 +69,7 @@
             var cell = cells[i];
             if (cell.getAttribute("data-hl")) { continue; }
             var text = cell.textContent;
-            if (text.replace(/ /g, " ").trim() !== "") {
+            if (text.trim() !== "") {
                 cell.innerHTML = highlightPhp(text);
             }
             cell.setAttribute("data-hl", "1");

@@ -79,7 +79,6 @@ body {
     align-items: center; gap: 7px; font-size: 13px;
 }
 .btn:hover { color: var(--ink); border-color: var(--faint); }
-.btn svg { opacity: .8; }
 .version-badge {
     font-size: 12px; color: var(--muted); background: var(--chip); border: 1px solid var(--border);
     padding: 6px 11px; border-radius: 999px; text-decoration: none;
@@ -134,9 +133,6 @@ body {
 .frame-call .cls a:hover { text-decoration: underline; }
 .frame-call .op { color: var(--faint); }
 .frame-call .fn { color: var(--ink); font-weight: 650; }
-.frame-call .arg-str { color: var(--ok); }
-.frame-call .arg-num { color: #b25000; }
-html[data-theme="dark"] .frame-call .arg-num { color: #ff9e64; }
 .frame.vendor .frame-call .fn { color: var(--muted); font-weight: 550; }
 .tag-app {
     font-size: 9px; font-weight: 700; letter-spacing: .4px; color: var(--ok); text-transform: uppercase;
@@ -196,11 +192,6 @@ html[data-theme="dark"] .frame-call .arg-num { color: #ff9e64; }
 .grid tr:hover td { background: var(--panel-2); }
 .grid .k { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; width: 1%; }
 .grid .v { font-family: var(--mono); font-size: 12px; word-break: break-word; }
-.grid .v .t-str { color: var(--ok); }
-.grid .v .t-num { color: #b25000; }
-.grid .v .t-obj { color: #8250df; }
-html[data-theme="dark"] .grid .v .t-num { color: #ff9e64; }
-html[data-theme="dark"] .grid .v .t-obj { color: #d2a8ff; }
 
 /* memory stats */
 .stats { display: flex; gap: 14px; flex-wrap: wrap; }
