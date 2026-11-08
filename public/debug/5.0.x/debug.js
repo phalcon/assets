@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
  *
- * Phalcon\Support\Debug — debug error page behavior.
+ * Phalcon\Support\Debug - debug error page behavior.
  * Served from the assets repository (e.g. assets.phalcon.io/debug/<version>/debug.js).
  *
  * This is an enhancer: the component renders the full markup server-side, this
@@ -231,7 +231,7 @@
 })();
 
 /**
- * Markup contract — what the component must render for this script:
+ * Markup contract - what the component must render for this script:
  *
  *   <html data-theme="light">                        theme root (script flips data-theme)
  *
