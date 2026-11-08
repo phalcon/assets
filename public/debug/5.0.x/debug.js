@@ -25,7 +25,9 @@
     }
 
     function escAttr(s) {
-        return String(s).replace(/"/g, "&quot;");
+        return String(s).replace(/[&"]/g, function (c) {
+            return { "&": "&amp;", "\"": "&quot;" }[c];
+        });
     }
 
     /* ---- PHP syntax highlighter (no dependencies) ---- */
@@ -88,10 +90,30 @@
         toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 1400);
     }
 
+    /* The clipboard API is only in secure contexts (https, localhost). */
+    function copyWithTextarea(text) {
+        var area = document.createElement("textarea");
+        var copied = false;
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.select();
+        try { copied = document.execCommand("copy"); } catch (e) {}
+        document.body.removeChild(area);
+        return copied;
+    }
+
     function copy(text, msg) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(function () { toast(msg); });
+            navigator.clipboard.writeText(text).then(
+                function () { toast(msg); },
+                function () { toast("Copy failed"); }
+            );
+            return;
         }
+        toast(copyWithTextarea(text) ? msg : "Copy failed");
     }
 
     /* ---- theme ---- */
@@ -127,13 +149,16 @@
             if (el.querySelector(".mini")) { continue; }
             var file = el.getAttribute("data-file");
             var line = el.getAttribute("data-line") || "";
-            var enc = encodeURI(file);
+            /* PhpStorm takes the path as one query value; VS Code takes a path, so encode each segment. */
+            var phpstorm = "phpstorm://open?file=" + encodeURIComponent(file) + "&line=" + encodeURIComponent(line);
+            var vscode = "vscode://file" + file.split("/").map(encodeURIComponent).join("/") +
+                (line ? ":" + encodeURIComponent(line) : "");
             var mini = document.createElement("span");
             mini.className = "mini";
             mini.innerHTML =
                 '<button class="icon-btn" data-copy="' + escAttr(file) + '">Copy path</button>' +
-                '<a class="icon-btn" href="phpstorm://open?file=' + enc + "&line=" + line + '">PhpStorm</a>' +
-                '<a class="icon-btn" href="vscode://file' + enc + (line ? ":" + line : "") + '">VS Code</a>';
+                '<a class="icon-btn" href="' + escAttr(phpstorm) + '">PhpStorm</a>' +
+                '<a class="icon-btn" href="' + escAttr(vscode) + '">VS Code</a>';
             el.appendChild(mini);
         }
     }
