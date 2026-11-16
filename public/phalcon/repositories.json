@@ -3,7 +3,7 @@
         {
             "id": "phalcon/cphalcon",
             "url": "https://github.com/phalcon/cphalcon",
-            "stars": 10818,
+            "stars": 10817,
             "stable": {
                 "tag": "v5.23.0",
                 "version": "5.23.0",
@@ -36,7 +36,7 @@
         {
             "id": "zephir-lang/zephir",
             "url": "https://github.com/zephir-lang/zephir",
-            "stars": 3380,
+            "stars": 3379,
             "stable": {
                 "tag": "1.8.0",
                 "version": "1.8.0",
